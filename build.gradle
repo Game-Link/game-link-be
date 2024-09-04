@@ -1,0 +1,132 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com'
+version = '1.0.0'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+jar {
+	enabled = false
+}
+
+repositories {
+	mavenCentral()
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+dependencies {
+	// spring boot
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// monitoring
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// AWS
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.projectlombok:lombok'
+
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+	// redis
+//	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+
+	// db
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// jwt
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+	// json
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	// swagger
+	annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0'
+	implementation 'com.github.therapi:therapi-runtime-javadoc:0.15.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0'
+
+	// mongoDB
+//	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+
+	// Oauth
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// error log
+	implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+	// WebSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// sockjs
+	implementation 'org.webjars:sockjs-client:1.5.1'
+
+	// stomp
+	implementation 'org.webjars:stomp-websocket:2.3.4'
+
+	// kafka
+//	implementation 'org.springframework.kafka:spring-kafka'
+
+	// gson
+	implementation 'com.google.code.gson:gson:2.9.0'
+
+	// dynamodb
+//	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.268'
+//	implementation 'io.github.boostchicken:spring-data-dynamodb:5.2.5'
+
+	// test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.squareup.okhttp3:mockwebserver:4.10.0'
+	testImplementation "org.testcontainers:junit-jupiter:1.16.3"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+test {
+	String activeProfile = project.properties.get('spring.profiles.active')
+	println "Actived profile: $activeProfile"
+	systemProperty "spring.profiles.active", activeProfile
+
+	testLogging {
+		events "failed"
+		exceptionFormat "full"
+	}
+}
+test.dependsOn 'copyPrivate'
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}
+
+bootRun {
+	jvmArgs = ["-Duser.timezone=Asia/Seoul"]
+}
