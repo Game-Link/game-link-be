@@ -1,0 +1,51 @@
+package com.gamelink.backend.global.auth.jwt.repository.custom.impl;
+
+import com.gamelink.backend.global.auth.jwt.exception.JwtTokenNotFoundException;
+import com.gamelink.backend.global.auth.jwt.repository.custom.CustomTokenRepository;
+import com.gamelink.backend.global.auth.model.JwtToken;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class CustomTokenRepositoryImpl implements CustomTokenRepository {
+
+    private final MongoTemplate mongoTemplate;
+
+    /**
+     * accessToken으로 Token 객체 조회
+     */
+    @Override
+    public JwtToken findRefreshToken(String accessToken) {
+        return mongoTemplate.find(
+                new Query(Criteria.where("accessToken").is(accessToken)), JwtToken.class)
+                .stream()
+                .findFirst()
+                .orElseThrow(JwtTokenNotFoundException::new);
+    }
+
+    /**
+     * userSubId로 JwtToken의 accessToken, refreshToken 업데이트
+     */
+    @Override
+    public void updateJwtToken(String userSubId, String accessToken, String refreshToken) {
+        Query query = new Query(Criteria.where("userSubId").is(userSubId));
+
+        Update update = new Update();
+        update.set("accessToken", accessToken);
+        update.set("refreshToken", refreshToken);
+        update.set("updatedAt", System.currentTimeMillis());
+
+        mongoTemplate.updateFirst(query, update, JwtToken.class);
+    }
+
+    @Override
+    public void deleteByUserSubId(String userSubId) {
+        Query query = new Query(Criteria.where("userSubId").is(userSubId));
+        mongoTemplate.remove(query, JwtToken.class);
+    }
+}
