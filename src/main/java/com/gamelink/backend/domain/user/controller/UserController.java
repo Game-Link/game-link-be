@@ -33,7 +33,7 @@ public class UserController {
         log.info("토큰 발급 성공!");
         String redirectUrl = "kakao01302532fd3136475b7951652fe58666://oauth" +
                 "?accessToken=" + result.getAccessToken() + "&refreshToken=" + result.getRefreshToken() +
-                "uniqueId=" + result.getUniqueId();
+                "&uniqueId=" + result.getUniqueId();
 
         return new RedirectView(redirectUrl);
     }
