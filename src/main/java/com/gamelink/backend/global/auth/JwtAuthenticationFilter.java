@@ -30,12 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
         String accessToken = authenticationTokenProvider.getTokenFromHeader(request, JwtProvider.ACCESS_PREFIX);
-        String refreshToken = authenticationTokenProvider.getTokenFromHeader(request, JwtProvider.REFRESH_PREFIX);
         if (accessToken == null) {
             request.setAttribute("access-token-none", true);
             SecurityContextHolder.getContext().setAuthentication(GuestAuthentication.getAuthentication());
-        } else if (refreshToken == null) {
-            throw new RefreshTokenNotFoundException();
         } else {
             JwtAuthentication authentication = authenticationTokenProvider.getAuthentication(request, response);
             request.setAttribute("access-token-none", false);
