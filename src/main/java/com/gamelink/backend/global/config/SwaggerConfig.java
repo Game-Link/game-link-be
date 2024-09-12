@@ -6,15 +6,20 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.DateTimeSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -25,7 +30,8 @@ import java.util.Map;
                 description = "GameLink RESTFUL API 제공"
         ),
         servers = {
-                @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "로컬 서버"),
+                @io.swagger.v3.oas.annotations.servers.Server(url = "http://43.203.255.62", description = "개발서버"),
+                @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "로컬 서버")
         }
 )
 @SecurityScheme(
@@ -63,8 +69,55 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
-                .group("user-api")
+                .group("유저")
                 .pathsToMatch("/user/**")
                 .build();
+    }
+
+    @Bean
+    GroupedOpenApi testApi() {
+        return GroupedOpenApi.builder()
+                .group("테스트")
+                .pathsToMatch("/test/**")
+                .build();
+    }
+
+    @Bean
+    GroupedOpenApi gameApi() {
+        return GroupedOpenApi.builder()
+                .group("라이엇")
+                .pathsToMatch("/riot/**")
+                .build();
+    }
+
+    @Bean
+    GroupedOpenApi chatApi() {
+        return GroupedOpenApi.builder()
+                .group("채팅")
+                .pathsToMatch("/chat/**")
+                .build();
+    }
+
+    @Bean
+    public OpenAPI myOpenAPI() {
+        Server localServer = new Server();
+        localServer.setUrl("http://localhost:8080/");
+        localServer.setDescription("로컬서버");
+
+        Server devServer = new Server();
+        devServer.setUrl("http://43.203.255.62");
+        devServer.setDescription("개발서버");
+
+        Contact contact = new Contact();
+        contact.setEmail("info@gamelink.com");
+        contact.setName("GameLink Corp.");
+        contact.setUrl("https://gamelink.com");
+
+        Info info = new Info()
+                .title("GameLink API")
+                .version("1.0.0")
+                .contact(contact);
+
+        return new OpenAPI().info(info).servers(List.of(localServer, devServer));
     }
 }
