@@ -4,6 +4,7 @@ import com.gamelink.backend.domain.user.model.UserStatus;
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.global.auth.UserRole;
 import com.gamelink.backend.global.auth.jwt.exception.IllegalTokenException;
+import com.gamelink.backend.global.auth.jwt.exception.InvalidTokenException;
 import com.gamelink.backend.global.auth.jwt.repository.TokenRepository;
 import com.gamelink.backend.global.auth.model.JwtToken;
 import io.jsonwebtoken.*;
@@ -44,16 +45,12 @@ public class JwtProvider implements AuthenticationTokenProvider {
     @Override
     public String getTokenFromHeader(HttpServletRequest request, String prefix) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return null;
-        }
-
-        Optional<Cookie> maybeCookie = Arrays.stream(cookies)
-                .filter(cookie -> cookie.getName().equalsIgnoreCase(prefix))
-                .findFirst();
-
-        if (maybeCookie.isPresent()) {
-            return maybeCookie.get().getValue();
+        if (cookies != null) {
+            for(Cookie cookie : cookies) {
+                if (cookie.getName().equalsIgnoreCase(ACCESS_PREFIX)) {
+                    return cookie.getValue();
+                }
+            }
         }
 
         String header = request.getHeader(AUTHORIZATION);
@@ -72,28 +69,16 @@ public class JwtProvider implements AuthenticationTokenProvider {
     public JwtAuthentication getAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = getTokenFromHeader(request, ACCESS_PREFIX);
         if (accessToken == null) {
-            throw new IllegalTokenException("token is null");
+            throw new InvalidTokenException();
         }
         Jws<Claims> claimsJws;
         try {
             claimsJws = validateToken(accessToken);
             return createJwtAuthentication(claimsJws);
         } catch (ExpiredJwtException e) {
-            // AccessToken이 만료된 경우, RefreshToken을 이용하여 재발급
-            JwtToken jwtToken = tokenRepository.findRefreshToken(accessToken);
-            String refreshToken = jwtToken.getRefreshToken();
-            if (!validateRefreshToken(refreshToken)) {
-                tokenRepository.deleteByUserSubId(jwtToken.getUserSubId());
-                throw new IllegalTokenException("refresh token is invalid");
-            }
-            AuthenticationToken newToken = reissue(accessToken);
-            claimsJws = validateToken(newToken.getAccessToken());
-            response.addHeader(HttpHeaders.SET_COOKIE, ACCESS_PREFIX + "=" + newToken.getAccessToken());
-            response.addHeader(HttpHeaders.SET_COOKIE, REFRESH_PREFIX + "=" + newToken.getRefreshToken());
-            tokenRepository.updateJwtToken(claimsJws.getBody().get("userSubId", String.class), newToken.getAccessToken(), newToken.getRefreshToken());
-            return createJwtAuthentication(claimsJws);
+            throw new InvalidTokenException();
         } catch (JwtException e) {
-            throw new IllegalTokenException("token is invalid");
+            throw new InvalidTokenException();
         }
     }
 
@@ -106,10 +91,15 @@ public class JwtProvider implements AuthenticationTokenProvider {
         return token;
     }
 
-    private JwtAuthenticationToken reissue(String accessToken) {
+    public JwtAuthenticationToken reissue(String accessToken) {
+        String newAccessToken = refreshAccessToken(accessToken);
+        String newRefreshToken = createRefreshToken();
+        Jws<Claims> claimsJws = validateToken(accessToken);
+        tokenRepository.updateJwtToken(claimsJws.getBody().get("userSubId", String.class), newAccessToken, newRefreshToken);
+
         return JwtAuthenticationToken.builder()
-                .accessToken(refreshAccessToken(accessToken))
-                .refreshToken(createRefreshToken())
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
                 .build();
     }
 
@@ -173,7 +163,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
         }
     }
 
-    private boolean validateRefreshToken(String refreshToken) {
+    public boolean validateRefreshToken(String refreshToken) {
         try {
             Jwts.parser()
                     .setSigningKey(secretKey.getBytes())
