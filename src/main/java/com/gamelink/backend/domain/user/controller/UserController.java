@@ -1,5 +1,6 @@
 package com.gamelink.backend.domain.user.controller;
 
+import com.gamelink.backend.domain.user.model.dto.request.RequestKakaoOAuthLogin;
 import com.gamelink.backend.domain.user.model.dto.request.RequestReissue;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseOAuthLoginDto;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseToken;
@@ -27,15 +28,9 @@ public class UserController {
      * <p>AuthToken은 OAuth 로그인 후 생성된 사용자 고유 토큰 값입니다.</p>
      * <p>고유 토큰으로 API를 호출 시 회원가입 또는 로그인이 진행되어 URL에 access, refresh 토큰을 담아서 전달합니다.</p>
      */
-    @GetMapping("/oauth/callback")
-    public RedirectView redirectKakaoOAuth(@RequestParam(value = "code") String authToken) {
-        ResponseOAuthLoginDto result = oAuthService.kakaoLogin(authToken);
-        log.info("토큰 발급 성공!");
-        String redirectUrl = "kakao01302532fd3136475b7951652fe58666://oauth" +
-                "?accessToken=" + result.getAccessToken() + "&refreshToken=" + result.getRefreshToken() +
-                "&uniqueId=" + result.getUniqueId();
-
-        return new RedirectView(redirectUrl);
+    @PostMapping("/oauth/callback")
+    public ResponseOAuthLoginDto redirectKakaoOAuth(@RequestBody RequestKakaoOAuthLogin request) {
+        return oAuthService.kakaoLogin(request);
     }
 
 
