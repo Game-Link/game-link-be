@@ -21,16 +21,18 @@ public class User extends BaseEntity {
     private String nickname;
     private String email;
     private String phone;
+    private String uniqueId;
     private Enrolled enrolled;
     private UserRole userRole;
     private UserStatus status;
 
     @Builder
-    private User(String name, String nickname ,String email, String phone, Enrolled enrolled) {
+    private User(String name, String nickname ,String email, String phone, String uniqueId, Enrolled enrolled) {
         this.name = name;
         this.nickname = nickname;
         this.email = email;
         this.phone = phone;
+        this.uniqueId = uniqueId;
         this.enrolled = enrolled;
         this.userRole = UserRole.USER;
         this.status = UserStatus.ACTIVE;
