@@ -39,8 +39,8 @@ public class OAuthServiceImpl implements OAuthService {
     @Override
     @Transactional
     public ResponseOAuthLoginDto kakaoLogin(RequestKakaoOAuthLogin request) {
-        // TODO : Device 정보 관리 및 Kakao 로그인 토큰 관리 필요
-        JsonNode userResource = getUserResource(request.getKakaoInfo().getAccessToken(), "kakao");
+        // TODO : OAuth (Kakao, Naver, Google) 로그인 토큰 관리 필요
+        JsonNode userResource = getUserResource(request.getKakaoInfo().getAccess_token(), "kakao");
 
         String name = userResource.get("kakao_account").get("name").asText();
         String email = userResource.get("kakao_account").get("email").asText();
