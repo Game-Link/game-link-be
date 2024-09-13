@@ -71,9 +71,9 @@ public class OAuthServiceImpl implements OAuthService {
         return new ResponseOAuthLoginDto(user, newToken);
     }
 
-    private JsonNode getUserResource(String authToken, String registrationId) {
+    private JsonNode getUserResource(String accessToken, String registrationId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + authToken);
+        headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity entity = new HttpEntity(headers);
 
         String resourceUri = env.getProperty("app." + registrationId + ".resource-uri");

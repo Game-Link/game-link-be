@@ -11,15 +11,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestKakaoTokenInfo {
 
-    private String accessToken;
+    private String access_token;
 
-    private int expiresIn;
+    private int expires_in;
 
-    private String refreshToken;
+    private String refresh_token;
 
-    private int refreshTokenExpiresIn;
+    private int refresh_token_expires_in;
 
     private String scope;
 
-    private String tokenType;
+    private String token_type;
 }
