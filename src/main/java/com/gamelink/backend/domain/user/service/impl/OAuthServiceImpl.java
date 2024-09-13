@@ -3,8 +3,11 @@ package com.gamelink.backend.domain.user.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.gamelink.backend.domain.user.exception.UserNotFoundException;
 import com.gamelink.backend.domain.user.model.Enrolled;
+import com.gamelink.backend.domain.user.model.dto.request.RequestKakaoOAuthLogin;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseOAuthLoginDto;
+import com.gamelink.backend.domain.user.model.entity.Device;
 import com.gamelink.backend.domain.user.model.entity.User;
+import com.gamelink.backend.domain.user.repository.DeviceRepository;
 import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.domain.user.service.OAuthService;
 import com.gamelink.backend.global.auth.jwt.AuthenticationToken;
@@ -23,18 +26,20 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class OAuthServiceImpl implements OAuthService {
 
     private final Environment env;
     private final RestTemplate restTemplate = new RestTemplate();
     private final UserRepository userRepository;
+    private final DeviceRepository deviceRepository;
     private final JwtProvider jwtProvider;
 
     @Override
     @Transactional
-    public ResponseOAuthLoginDto kakaoLogin(String authToken) {
-        JsonNode userResource = getUserResource(authToken, "kakao");
+    public ResponseOAuthLoginDto kakaoLogin(RequestKakaoOAuthLogin request) {
+        JsonNode userResource = getUserResource(request.getAuthToken(), "kakao");
 
         String name = userResource.get("kakao_account").get("name").asText();
         String email = userResource.get("kakao_account").get("email").asText();
@@ -57,7 +62,9 @@ public class OAuthServiceImpl implements OAuthService {
                     .name(name)
                     .enrolled(Enrolled.KAKAO)
                     .build();
-            userRepository.save(user);
+            user = userRepository.save(user);
+            Device device = Device.convertFromLoginRequest(user, request);
+            deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
         return new ResponseOAuthLoginDto(user, newToken);
