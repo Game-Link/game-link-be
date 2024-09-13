@@ -32,6 +32,7 @@ public class UserController {
     @PostMapping("/oauth/callback")
     public ResponseOAuthLoginDto redirectKakaoOAuth(HttpServletRequest apiRequest, @RequestBody RequestKakaoOAuthLogin request) {
         log.info("OAuth Callback RequestUri : {}", apiRequest.getRequestURI());
+        log.info("OAuth Callback RequestUrl : {}", apiRequest.getRequestURL());
         return oAuthService.kakaoLogin(request);
     }
 
