@@ -7,6 +7,7 @@ import com.gamelink.backend.domain.user.model.dto.response.ResponseToken;
 import com.gamelink.backend.domain.user.service.OAuthService;
 import com.gamelink.backend.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,8 @@ public class UserController {
      * <p>고유 토큰으로 API를 호출 시 회원가입 또는 로그인이 진행되어 URL에 access, refresh 토큰을 담아서 전달합니다.</p>
      */
     @PostMapping("/oauth/callback")
-    public ResponseOAuthLoginDto redirectKakaoOAuth(@RequestBody RequestKakaoOAuthLogin request) {
+    public ResponseOAuthLoginDto redirectKakaoOAuth(HttpServletRequest apiRequest, @RequestBody RequestKakaoOAuthLogin request) {
+        log.info("OAuth Callback RequestUri : {}", apiRequest.getRequestURI());
         return oAuthService.kakaoLogin(request);
     }
 
