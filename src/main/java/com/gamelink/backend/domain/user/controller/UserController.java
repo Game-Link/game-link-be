@@ -29,7 +29,7 @@ public class UserController {
      * <p>AuthToken은 OAuth 로그인 후 생성된 사용자 고유 토큰 값입니다.</p>
      * <p>고유 토큰으로 API를 호출 시 회원가입 또는 로그인이 진행되어 URL에 access, refresh 토큰을 담아서 전달합니다.</p>
      */
-    @PostMapping("/oauth/callback")
+    @PostMapping("/oauth/kakao/login")
     public ResponseOAuthLoginDto redirectKakaoOAuth(@RequestBody RequestKakaoOAuthLogin request) {
         return oAuthService.kakaoLogin(request);
     }

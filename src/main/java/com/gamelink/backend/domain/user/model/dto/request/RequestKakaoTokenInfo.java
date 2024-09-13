@@ -1,6 +1,5 @@
 package com.gamelink.backend.domain.user.model.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestKakaoOAuthLogin {
+public class RequestKakaoTokenInfo {
 
-    private RequestDeviceInfo deviceInfo;
+    private String accessToken;
 
-    private RequestKakaoTokenInfo kakaoInfo;
+    private int expiresIn;
+
+    private String refreshToken;
+
+    private int refreshTokenExpiresIn;
+
+    private String scope;
+
+    private String tokenType;
 }

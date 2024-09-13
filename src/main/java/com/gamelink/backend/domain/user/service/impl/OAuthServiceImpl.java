@@ -39,8 +39,8 @@ public class OAuthServiceImpl implements OAuthService {
     @Override
     @Transactional
     public ResponseOAuthLoginDto kakaoLogin(RequestKakaoOAuthLogin request) {
-        String accessToken = getAccessToken(request.getAuthToken(), "kakao");
-        JsonNode userResource = getUserResource(accessToken, "kakao");
+        // TODO : Device 정보 관리 및 Kakao 로그인 토큰 관리 필요
+        JsonNode userResource = getUserResource(request.getKakaoInfo().getAccessToken(), "kakao");
 
         String name = userResource.get("kakao_account").get("name").asText();
         String email = userResource.get("kakao_account").get("email").asText();
@@ -64,33 +64,11 @@ public class OAuthServiceImpl implements OAuthService {
                     .enrolled(Enrolled.KAKAO)
                     .build();
             user = userRepository.save(user);
-            Device device = Device.convertFromLoginRequest(user, request);
+            Device device = Device.convertFromLoginRequest(user, request.getDeviceInfo());
             deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
         return new ResponseOAuthLoginDto(user, newToken);
-    }
-
-    private String getAccessToken(String authToken, String kakao) {
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-
-        String clientId = env.getProperty("app." + kakao + ".client-id");
-        String redirectUri = env.getProperty("app." + kakao + ".redirect-uri");
-        String grantType = "authorization_code";
-        String tokenUri = env.getProperty("app." + kakao + ".token-uri");
-
-        params.add("code", authToken);
-        params.add("client_id", clientId);
-        params.add("redirect_uri", redirectUri);
-        params.add("grant_type", grantType);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        HttpEntity entity = new HttpEntity(params, headers);
-
-        ResponseEntity<JsonNode> response = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, JsonNode.class);
-        return response.getBody().get("access_token").asText();
     }
 
     private JsonNode getUserResource(String authToken, String registrationId) {

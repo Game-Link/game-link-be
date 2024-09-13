@@ -1,5 +1,6 @@
 package com.gamelink.backend.domain.user.model.entity;
 
+import com.gamelink.backend.domain.user.model.dto.request.RequestDeviceInfo;
 import com.gamelink.backend.domain.user.model.dto.request.RequestKakaoOAuthLogin;
 import com.gamelink.backend.global.base.BaseEntity;
 import jakarta.persistence.*;
@@ -33,7 +34,7 @@ public class Device extends BaseEntity {
         this.model = model;
     }
 
-    public static Device convertFromLoginRequest(User user, RequestKakaoOAuthLogin request) {
+    public static Device convertFromLoginRequest(User user, RequestDeviceInfo request) {
         return new Device(
                 user,
                 request.getUniqueId(),
