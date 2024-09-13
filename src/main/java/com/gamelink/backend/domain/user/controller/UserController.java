@@ -30,9 +30,7 @@ public class UserController {
      * <p>고유 토큰으로 API를 호출 시 회원가입 또는 로그인이 진행되어 URL에 access, refresh 토큰을 담아서 전달합니다.</p>
      */
     @PostMapping("/oauth/callback")
-    public ResponseOAuthLoginDto redirectKakaoOAuth(HttpServletRequest apiRequest, @RequestBody RequestKakaoOAuthLogin request) {
-        log.info("OAuth Callback RequestUri : {}", apiRequest.getRequestURI());
-        log.info("OAuth Callback RequestUrl : {}", apiRequest.getRequestURL());
+    public ResponseOAuthLoginDto redirectKakaoOAuth(@RequestBody RequestKakaoOAuthLogin request) {
         return oAuthService.kakaoLogin(request);
     }
 
