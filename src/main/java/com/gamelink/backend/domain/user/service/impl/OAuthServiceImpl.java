@@ -1,6 +1,7 @@
 package com.gamelink.backend.domain.user.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.gamelink.backend.domain.user.exception.DeviceNotFoundException;
 import com.gamelink.backend.domain.user.exception.UserNotFoundException;
 import com.gamelink.backend.domain.user.model.Enrolled;
 import com.gamelink.backend.domain.user.model.dto.request.RequestKakaoOAuthLogin;
@@ -46,10 +47,6 @@ public class OAuthServiceImpl implements OAuthService {
         String email = userResource.get("kakao_account").get("email").asText();
         String phone = userResource.get("kakao_account").get("phone_number").asText();
 
-        log.info("User name : {}", name);
-        log.info("User Email : {}", email);
-        log.info("User PhoneNumber : {}", phone);
-
         Optional<User> maybeUser = userRepository.findByName(name);
         User user;
 
@@ -68,7 +65,8 @@ public class OAuthServiceImpl implements OAuthService {
             deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
-        return new ResponseOAuthLoginDto(user, newToken);
+        Device device = deviceRepository.findOneByUserSubId(user.getSubId()).orElseThrow(DeviceNotFoundException::new);
+        return new ResponseOAuthLoginDto(device, newToken);
     }
 
     private JsonNode getUserResource(String accessToken, String registrationId) {
