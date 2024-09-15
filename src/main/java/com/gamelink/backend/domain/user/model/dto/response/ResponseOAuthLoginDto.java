@@ -1,5 +1,6 @@
 package com.gamelink.backend.domain.user.model.dto.response;
 
+import com.gamelink.backend.domain.user.model.entity.Device;
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.global.auth.jwt.AuthenticationToken;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,9 +18,9 @@ public class ResponseOAuthLoginDto {
     @Schema(description = "사용자 기기 Id")
     private final String uniqueId;
 
-    public ResponseOAuthLoginDto(User user, AuthenticationToken token) {
+    public ResponseOAuthLoginDto(Device device, AuthenticationToken token) {
         this.accessToken = token.getAccessToken();
         this.refreshToken = token.getRefreshToken();
-        this.uniqueId = user.getUniqueId();
+        this.uniqueId = device.getUniqueId();
     }
 }

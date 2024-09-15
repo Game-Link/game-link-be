@@ -34,7 +34,6 @@ public class UserController {
         return oAuthService.kakaoLogin(request);
     }
 
-
     /**
      * 토큰 재발급
      */
