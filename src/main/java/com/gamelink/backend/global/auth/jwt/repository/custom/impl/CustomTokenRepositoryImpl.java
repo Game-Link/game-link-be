@@ -5,6 +5,7 @@ import com.gamelink.backend.global.auth.jwt.exception.JwtTokenNotFoundException;
 import com.gamelink.backend.global.auth.jwt.repository.custom.CustomTokenRepository;
 import com.gamelink.backend.global.auth.model.JwtToken;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.LocalDateTime;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,7 +31,7 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
         Update update = new Update();
         update.set("accessToken", accessToken);
         update.set("refreshToken", refreshToken);
-        update.set("updatedAt", System.currentTimeMillis());
+        update.set("updatedAt", LocalDateTime.now());
 
         mongoTemplate.updateFirst(query, update, JwtToken.class);
     }
@@ -47,12 +48,10 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
 
     @Override
     public Optional<JwtToken> findUserToken(String userSubId) {
-        JwtToken maybeJwtToken = mongoTemplate.findOne(
-                new Query(Criteria.where("userSubId").is(userSubId)), JwtToken.class);
-        if (maybeJwtToken == null) {
-            throw new JwtTokenNotFoundException();
-        } else {
-            return Optional.of(maybeJwtToken);
+        JwtToken maybeJwtToken = mongoTemplate.find(
+                new Query(Criteria.where("userSubId").is(userSubId)), JwtToken.class)
+                .stream().findFirst().orElseThrow(JwtTokenNotFoundException::new);
+            return Optional.ofNullable(maybeJwtToken);
         }
     }
 }
