@@ -46,9 +46,9 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
     }
 
     @Override
-    public Optional<JwtToken> findUserToken(UUID subId) {
+    public Optional<JwtToken> findUserToken(String userSubId) {
         JwtToken maybeJwtToken = mongoTemplate.findOne(
-                new Query(Criteria.where("userSubId").is(subId.toString())), JwtToken.class);
+                new Query(Criteria.where("userSubId").is(userSubId)), JwtToken.class);
         if (maybeJwtToken == null) {
             throw new JwtTokenNotFoundException();
         } else {

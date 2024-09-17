@@ -97,27 +97,4 @@ public class SwaggerConfig {
                 .pathsToMatch("/chat/**")
                 .build();
     }
-
-    @Bean
-    public OpenAPI myOpenAPI() {
-        Server localServer = new Server();
-        localServer.setUrl("http://localhost:8080/");
-        localServer.setDescription("로컬서버");
-
-        Server devServer = new Server();
-        devServer.setUrl("https://gamelink.asia/api");
-        devServer.setDescription("개발서버");
-
-        Contact contact = new Contact();
-        contact.setEmail("info@gamelink.asia");
-        contact.setName("GameLink Corp.");
-        contact.setUrl("https://gamelink.asia");
-
-        Info info = new Info()
-                .title("GameLink API")
-                .version("1.0.0")
-                .contact(contact);
-
-        return new OpenAPI().info(info).servers(List.of(localServer, devServer));
-    }
 }
