@@ -39,7 +39,7 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
     @Override
     public String findAccessToken(String refreshToken) {
         return mongoTemplate.find(
-                new Query(Criteria.where("refreshToken").is(refreshToken)), JwtToken.class)
+                        new Query(Criteria.where("refreshToken").is(refreshToken)), JwtToken.class)
                 .stream()
                 .findFirst()
                 .orElseThrow(InvalidTokenException::new)
@@ -49,9 +49,8 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
     @Override
     public Optional<JwtToken> findUserToken(String userSubId) {
         JwtToken maybeJwtToken = mongoTemplate.find(
-                new Query(Criteria.where("userSubId").is(userSubId)), JwtToken.class)
+                        new Query(Criteria.where("userSubId").is(userSubId)), JwtToken.class)
                 .stream().findFirst().orElseThrow(JwtTokenNotFoundException::new);
-            return Optional.ofNullable(maybeJwtToken);
-        }
+        return Optional.ofNullable(maybeJwtToken);
     }
 }
