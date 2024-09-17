@@ -18,5 +18,5 @@ public class JwtToken {
     private String accessToken;
     private String refreshToken;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedat;
+    private LocalDateTime updatedAt;
 }
