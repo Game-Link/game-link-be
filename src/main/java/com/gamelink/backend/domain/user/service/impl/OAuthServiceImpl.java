@@ -11,8 +11,11 @@ import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.domain.user.repository.DeviceRepository;
 import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.domain.user.service.OAuthService;
+import com.gamelink.backend.domain.user.util.NicknameProvider;
 import com.gamelink.backend.global.auth.jwt.AuthenticationToken;
 import com.gamelink.backend.global.auth.jwt.JwtProvider;
+import com.gamelink.backend.global.auth.jwt.repository.TokenRepository;
+import com.gamelink.backend.global.auth.model.JwtToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -23,6 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -33,9 +37,13 @@ public class OAuthServiceImpl implements OAuthService {
 
     private final Environment env;
     private final RestTemplate restTemplate = new RestTemplate();
+
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
+    private final TokenRepository tokenRepository;
+
     private final JwtProvider jwtProvider;
+    private final NicknameProvider nicknameProvider;
 
     @Override
     @Transactional
@@ -56,7 +64,7 @@ public class OAuthServiceImpl implements OAuthService {
             user = User.builder()
                     .email(email)
                     .phone(phone)
-                    .nickname("testNickname")
+                    .nickname(nicknameProvider.generateNickname())
                     .name(name)
                     .enrolled(Enrolled.KAKAO)
                     .build();
@@ -65,6 +73,19 @@ public class OAuthServiceImpl implements OAuthService {
             deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
+        Optional<JwtToken> userToken = tokenRepository.findUserToken(user.getSubId());
+        if (userToken.isPresent()) {
+            tokenRepository.updateJwtToken(user.getSubId().toString(), newToken.getAccessToken(), newToken.getRefreshToken());
+        } else {
+            tokenRepository.save(new JwtToken(
+                            user.getSubId().toString(),
+                            newToken.getAccessToken(),
+                            newToken.getRefreshToken(),
+                            LocalDateTime.now(),
+                            LocalDateTime.now()
+                    )
+            );
+        }
         Device device = deviceRepository.findOneByUserSubId(user.getSubId()).orElseThrow(DeviceNotFoundException::new);
         return new ResponseOAuthLoginDto(device, newToken);
     }
