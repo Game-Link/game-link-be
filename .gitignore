@@ -50,3 +50,4 @@ api.pdf
 
 ### Docker Compose Local File ###
 /docker-compose-local.yml
+/data/**
