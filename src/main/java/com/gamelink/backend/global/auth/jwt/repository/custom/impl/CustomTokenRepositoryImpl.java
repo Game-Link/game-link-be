@@ -11,6 +11,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class CustomTokenRepositoryImpl implements CustomTokenRepository {
@@ -40,5 +43,16 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
                 .findFirst()
                 .orElseThrow(InvalidTokenException::new)
                 .getAccessToken();
+    }
+
+    @Override
+    public Optional<JwtToken> findUserToken(UUID subId) {
+        JwtToken maybeJwtToken = mongoTemplate.findOne(
+                new Query(Criteria.where("userSubId").is(subId.toString())), JwtToken.class);
+        if (maybeJwtToken == null) {
+            throw new JwtTokenNotFoundException();
+        } else {
+            return Optional.of(maybeJwtToken);
+        }
     }
 }
