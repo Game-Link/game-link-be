@@ -30,7 +30,7 @@ import java.util.Map;
                 description = "GameLink RESTFUL API 제공"
         ),
         servers = {
-                @io.swagger.v3.oas.annotations.servers.Server(url = "http://43.203.255.62", description = "개발서버"),
+                @io.swagger.v3.oas.annotations.servers.Server(url = "https://gamelink.asia/api", description = "개발서버"),
                 @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "로컬 서버")
         }
 )
@@ -105,13 +105,13 @@ public class SwaggerConfig {
         localServer.setDescription("로컬서버");
 
         Server devServer = new Server();
-        devServer.setUrl("http://43.203.255.62");
+        devServer.setUrl("https://gamelink.asia/api");
         devServer.setDescription("개발서버");
 
         Contact contact = new Contact();
-        contact.setEmail("info@gamelink.com");
+        contact.setEmail("info@gamelink.asia");
         contact.setName("GameLink Corp.");
-        contact.setUrl("https://gamelink.com");
+        contact.setUrl("https://gamelink.asia");
 
         Info info = new Info()
                 .title("GameLink API")
