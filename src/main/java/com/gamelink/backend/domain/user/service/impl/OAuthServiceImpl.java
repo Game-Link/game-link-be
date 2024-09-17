@@ -73,19 +73,6 @@ public class OAuthServiceImpl implements OAuthService {
             deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
-        Optional<JwtToken> userToken = tokenRepository.findUserToken(user.getSubId().toString());
-        if (userToken.isPresent()) {
-            tokenRepository.updateJwtToken(user.getSubId().toString(), newToken.getAccessToken(), newToken.getRefreshToken());
-        } else {
-            tokenRepository.save(new JwtToken(
-                            user.getSubId().toString(),
-                            newToken.getAccessToken(),
-                            newToken.getRefreshToken(),
-                            LocalDateTime.now(),
-                            LocalDateTime.now()
-                    )
-            );
-        }
         Device device = deviceRepository.findOneByUserSubId(user.getSubId()).orElseThrow(DeviceNotFoundException::new);
         return new ResponseOAuthLoginDto(device, newToken);
     }

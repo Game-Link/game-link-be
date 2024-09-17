@@ -87,7 +87,19 @@ public class JwtProvider implements AuthenticationTokenProvider {
                 .accessToken(createAccessToken(user.getSubId().toString(), user.getUserRole(), user.getStatus()))
                 .refreshToken(createRefreshToken())
                 .build();
-        tokenRepository.save(new JwtToken(user.getSubId().toString(), token.getAccessToken(), token.getRefreshToken(), LocalDateTime.now(), LocalDateTime.now()));
+        Optional<JwtToken> userToken = tokenRepository.findUserToken(user.getSubId().toString());
+        if (userToken.isPresent()) {
+            tokenRepository.updateJwtToken(user.getSubId().toString(), token.getAccessToken(), token.getRefreshToken());
+        } else {
+            tokenRepository.save(new JwtToken(
+                            user.getSubId().toString(),
+                            token.getAccessToken(),
+                            token.getRefreshToken(),
+                            LocalDateTime.now(),
+                            LocalDateTime.now()
+                    )
+            );
+        }
         return token;
     }
 
