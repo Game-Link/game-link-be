@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class UserServiceImpl implements UserService {
 
@@ -22,7 +23,6 @@ public class UserServiceImpl implements UserService {
     private final JwtProvider jwtProvider;
 
     @Override
-    @Transactional
     public ResponseToken reissue(String refreshToken) {
         if(!jwtProvider.validateRefreshToken(refreshToken)) {
             throw new InvalidTokenException();

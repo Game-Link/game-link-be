@@ -46,7 +46,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
     public String getTokenFromHeader(HttpServletRequest request, String prefix) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            for(Cookie cookie : cookies) {
+            for (Cookie cookie : cookies) {
                 if (cookie.getName().equalsIgnoreCase(ACCESS_PREFIX)) {
                     return cookie.getValue();
                 }
@@ -56,7 +56,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
         String header = request.getHeader(AUTHORIZATION);
         if (header != null) {
             if (!header.toLowerCase().startsWith("bearer ")) {
-                throw new IllegalTokenException("token doesn't start with bearer");
+                throw new InvalidTokenException();
             }
 
             return header.substring(7);
@@ -107,7 +107,8 @@ public class JwtProvider implements AuthenticationTokenProvider {
         String newAccessToken = refreshAccessToken(accessToken);
         String newRefreshToken = createRefreshToken();
         Jws<Claims> claimsJws = validateToken(accessToken);
-        tokenRepository.updateJwtToken(claimsJws.getBody().get("userSubId", String.class), newAccessToken, newRefreshToken);
+        String userSubId = (String) claimsJws.getBody().get("userSubId");
+        tokenRepository.updateJwtToken(userSubId, newAccessToken, newRefreshToken);
 
         return JwtAuthenticationToken.builder()
                 .accessToken(newAccessToken)
@@ -128,7 +129,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
         } catch (ExpiredJwtException e) {
             userSubId = (String) e.getClaims().get("userSubId");
             role = UserRole.of((String) e.getClaims().get("userRole"));
-            userStatus = UserStatus.valueOf((String) e.getClaims( ).get("userStatus"));
+            userStatus = UserStatus.valueOf((String) e.getClaims().get("userStatus"));
         }
         return createAccessToken(userSubId, role, userStatus);
     }
@@ -168,10 +169,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             log.error("token is expired");
-            throw e;
+            throw new InvalidTokenException();
         } catch (JwtException e) {
             log.error("token is invalid");
-            throw e;
+            throw new InvalidTokenException();
         }
     }
 

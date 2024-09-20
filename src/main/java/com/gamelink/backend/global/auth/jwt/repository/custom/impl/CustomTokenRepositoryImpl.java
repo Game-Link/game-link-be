@@ -5,17 +5,19 @@ import com.gamelink.backend.global.auth.jwt.repository.custom.CustomTokenReposit
 import com.gamelink.backend.global.auth.model.JwtToken;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.time.*;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomTokenRepositoryImpl implements CustomTokenRepository {
 
     private final MongoTemplate mongoTemplate;
@@ -25,22 +27,20 @@ public class CustomTokenRepositoryImpl implements CustomTokenRepository {
      */
     @Override
     public void updateJwtToken(String userSubId, String accessToken, String refreshToken) {
-        try {
-            Query query = new Query(Criteria.where("userSubId").is(userSubId));
-
-            Update update = new Update();
-            update.set("accessToken", accessToken);
-            update.set("refreshToken", refreshToken);
-            update.set("updatedAt", LocalDateTime.now());
-
-            UpdateResult result = mongoTemplate.updateFirst(query, update, JwtToken.class);
-            if (result.getMatchedCount() == 0) {
-                throw new NullPointerException("토큰 객체를 찾을 수 없습니다.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // 예외 발생 시 로그로 출력
-            throw new RuntimeException("Failed to update JwtToken", e);
+        if (userSubId == null || accessToken == null || refreshToken == null) {
+            throw new IllegalArgumentException();
         }
+
+        ZonedDateTime seoulTime = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"));
+        Instant updatedAt = seoulTime.toInstant();
+
+        UpdateResult result = mongoTemplate.updateFirst(
+                new Query(Criteria.where("userSubId").is(userSubId)),
+                new Update().set("accessToken", accessToken)
+                        .set("refreshToken", refreshToken)
+                        .set("updatedAt", updatedAt),
+                JwtToken.class
+        );
     }
 
     @Override

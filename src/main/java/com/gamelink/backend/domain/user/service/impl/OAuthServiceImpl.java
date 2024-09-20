@@ -40,7 +40,6 @@ public class OAuthServiceImpl implements OAuthService {
 
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
-    private final TokenRepository tokenRepository;
 
     private final JwtProvider jwtProvider;
     private final NicknameProvider nicknameProvider;
