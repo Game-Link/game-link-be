@@ -1,6 +1,7 @@
 package com.gamelink.backend.debug.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -16,11 +17,14 @@ import com.gamelink.backend.global.auth.role.UserAuth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,6 +40,7 @@ public class TestController {
     private final JwtProvider jwtProvider;
     private final TokenRepository tokenRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * 테스트 로그인
@@ -98,4 +103,39 @@ public class TestController {
 //        Message message = objectMapper.readValue(stringChat, Message.class);
         log.info("MessageSenderImpl Message -> STring형: " + stringChat);
     }
+
+    /**
+     * 카카오 AccessToken 발급
+     */
+    @PostMapping("/kakao")
+    public String getKakaoLoginUrl() {
+        return "https://kauth.kakao.com/oauth/authorize?client_id=edbb963a11dccbcf54be5f9d18af4636&redirect_uri=http://localhost:8080/test/oauth2/code/kakao&response_type=code&scope=account_email,name,phone_number";
+    }
+
+    /**
+     * 카카오 AccessToken 발급
+     **/
+    @GetMapping("/oauth2/code/{registrationId}")
+    public String testLogin(@RequestParam String code, @PathVariable String registrationId) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
+        String clientId = "edbb963a11dccbcf54be5f9d18af4636";
+        String redirectUrl = "http://localhost:8080/test/oauth2/code/kakao";
+        String tokenUri = "https://kauth.kakao.com/oauth/token";
+
+        params.add("code", code);
+        params.add("client_id", clientId);
+        params.add("redirect_uri", redirectUrl);
+        params.add("grant_type", "authorization_code");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity entity = new HttpEntity(params, headers);
+
+        ResponseEntity<JsonNode> response = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, JsonNode.class);
+        String accessToken = response.getBody().get("access_token").asText();
+        return "accessToken : " + accessToken;
+    }
+
 }
