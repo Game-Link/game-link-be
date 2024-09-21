@@ -4,13 +4,12 @@ import com.gamelink.backend.domain.user.exception.UserNotFoundException;
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.infra.riot.exception.*;
+import com.gamelink.backend.infra.riot.model.RankType;
 import com.gamelink.backend.infra.riot.model.dto.response.*;
+import com.gamelink.backend.infra.riot.model.entity.RankQueue;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.TeamRank;
+import com.gamelink.backend.infra.riot.repository.RankQueueRepository;
 import com.gamelink.backend.infra.riot.repository.RiotUserRepository;
-import com.gamelink.backend.infra.riot.repository.SoloRankRepository;
-import com.gamelink.backend.infra.riot.repository.TeamRankRepository;
 import com.gamelink.backend.infra.riot.service.RiotAccountService;
 import com.gamelink.backend.infra.riot.service.RiotOpenApiService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,11 +28,10 @@ import java.util.UUID;
 public class RiotAccountServiceImpl implements RiotAccountService {
 
     private final RiotUserRepository riotUserRepository;
-    private final SoloRankRepository soloRankRepository;
-    private final TeamRankRepository teamRankRepository;
     private final UserRepository userRepository;
 
     private final RiotOpenApiService openApiService;
+    private final RankQueueRepository rankQueueRepository;
 
     @Override
     @Transactional
@@ -43,20 +43,16 @@ public class RiotAccountServiceImpl implements RiotAccountService {
         SummonerDto summonerDto = openApiService.getSummonerDto(accountDto.getPuuid());
 
         RiotUser riotUser = RiotUser.convertFromAccountAndSummonerDto(user, accountDto, summonerDto);
+        if (riotUserRepository.findOneByGameNameAndTagLine(gameName, tagLine).isPresent()) {
+            throw new RiotUserAlreadyExistException();
+        }
 
         openApiService.getLeagueInfo(riotUser).forEach(dto -> {
-            switch (dto.getQueueType()) {
-                case "RANKED_SOLO_5x5":
-                    SoloRank soloRank = SoloRank.convertFromLeagueEntryDto(riotUser, dto);
-                    soloRank.changeRiotUser(riotUser);
-                    break;
-                case "RANKED_FLEX_SR":
-                    TeamRank teamRank = TeamRank.convertFromLeagueEntryDto(riotUser, dto);
-                    teamRank.changeRiotUser(riotUser);
-                    break;
-                default:
-                    break;
+            if (dto.getTier() == null || dto.getRank() == null) {
+                return;
             }
+            RankQueue rankQueue = RankQueue.convertFromLeagueEntryDto(riotUser, dto);
+            rankQueue.changeRiotUser(riotUser);
         });
         riotUserRepository.save(riotUser);
     }
@@ -70,21 +66,12 @@ public class RiotAccountServiceImpl implements RiotAccountService {
             throw new RiotUserNotMatchException();
         }
 
-        final ResponseSummonerSoloRankDto[] soloRankDtos = new ResponseSummonerSoloRankDto[1];
-        final ResponseSummonerTeamRankDto[] teamRankDtos = new ResponseSummonerTeamRankDto[1];
-
-        riotUser.getQueues().forEach(queue -> {
-            if (queue instanceof SoloRank soloRank) {
-                soloRankDtos[0] = new ResponseSummonerSoloRankDto(soloRank);
-            } else if (queue instanceof TeamRank teamRank) {
-                teamRankDtos[0] = new ResponseSummonerTeamRankDto(teamRank);
-            }
-        });
-
         return new ResponseSummonerInfoDto(
                 riotUser,
-                soloRankDtos[0],
-                teamRankDtos[0]
+                riotUser.getQueues().stream().filter(RankQueue::isSoloRank).filter(RankQueue::isActive)
+                        .findFirst().map(ResponseSummonerSoloRankDto::new).orElse(null),
+                riotUser.getQueues().stream().filter(RankQueue::isTeamRank).filter(RankQueue::isActive)
+                        .findFirst().map(ResponseSummonerTeamRankDto::new).orElse(null)
         );
     }
 
@@ -93,26 +80,54 @@ public class RiotAccountServiceImpl implements RiotAccountService {
     public void refreshRiotAccountInfo(UUID userSubId) {
         RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
                 .orElseThrow(RiotUserNotFoundException::new);
-        SoloRank soloRank = soloRankRepository.findOneByRiotUserSubId(riotUser.getSubId())
-                .orElseThrow(SoloRankNotFoundException::new);
-        TeamRank teamRank = teamRankRepository.findOneByRiotUserSubId(riotUser.getSubId())
-                .orElseThrow(TeamRankNotFoundException::new);
 
         AccountDto accountDto = openApiService.getAccountDto(riotUser.getSummonerName(), riotUser.getSummonerTag());
         SummonerDto summonerDto = openApiService.getSummonerDto(accountDto.getPuuid());
 
         riotUser.changeInfo(accountDto, summonerDto);
-        openApiService.getLeagueInfo(riotUser).forEach(dto -> {
-            switch (dto.getQueueType()) {
-                case "RANKED_SOLO_5x5":
-                    soloRank.changeInfo(dto);
-                    break;
-                case "RANKED_FLEX_SR":
-                    teamRank.changeInfo(dto);
-                    break;
-                default:
-                    break;
+
+        Set<LeagueEntryDto> leagueInfo = openApiService.getLeagueInfo(riotUser);
+
+        List<RankQueue> queues = riotUser.getQueues();
+
+        leagueInfo.forEach(dto -> {
+            for (RankQueue queue : queues) {
+                if (dto.getQueueType().equals("RANKED_SOLO_5x5") && queue.getRankType() == RankType.SOLO_RANK) {
+                    queue.changeInfo(dto);
+                } else if (dto.getQueueType().equals("RANKED_FLEX_SR") && queue.getRankType() == RankType.TEAM_RANK) {
+                    queue.changeInfo(dto);
+                }
             }
         });
+        riotUserRepository.save(riotUser);
+    }
+
+    @Override
+    @Transactional
+    public void changeRiotAccountInfo(String gameName, String tagLine, UUID userSubId) {
+        RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
+                .orElseThrow(RiotUserNotFoundException::new);
+
+        if (gameName.isEmpty() && tagLine.isEmpty()) {
+            throw new ParameterNotFoundException("최소 하나의 값은 입력해야 합니다.");
+        }
+        String newName = gameName.isEmpty() ? riotUser.getSummonerName() : gameName;
+        String newTag = tagLine.isEmpty() ? riotUser.getSummonerTag() : tagLine;
+
+        AccountDto accountDto = openApiService.getAccountDto(newName, newTag);
+        SummonerDto summonerDto = openApiService.getSummonerDto(accountDto.getPuuid());
+
+        riotUser.changeInfo(accountDto, summonerDto);
+        rankQueueRepository.findAllByRiotUserSubId(riotUser.getSubId())
+                .forEach(RankQueue::changeToInactive);
+
+        openApiService.getLeagueInfo(riotUser).forEach(dto -> {
+            if (dto.getTier() == null || dto.getRank() == null) {
+                return;
+            }
+            RankQueue rankQueue = RankQueue.convertFromLeagueEntryDto(riotUser, dto);
+            rankQueue.changeRiotUser(riotUser);
+        });
+        riotUserRepository.save(riotUser);
     }
 }

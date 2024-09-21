@@ -10,4 +10,6 @@ public interface RiotAccountService {
     void registerRiotAccountInfo(String gameName, String tagLine, UUID userSubId);
 
     void refreshRiotAccountInfo(UUID userSubId);
+
+    void changeRiotAccountInfo(String gameName, String tagLine, UUID userSubId);
 }
