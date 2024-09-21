@@ -5,7 +5,7 @@ import org.springframework.lang.Nullable;
 
 public enum CustomHttpStatus {
 
-    CUSTOM_ERROR(600, CustomSeries.CUSTOM_ERROR, "Custom Error");
+    REFRESH_TOKEN_EXPIRED(601, CustomSeries.REFRESH_TOKEN_EXPIRED, "Refresh token expired"),;
 
     public static final CustomHttpStatus[] VALUES;
 
@@ -57,7 +57,7 @@ public enum CustomHttpStatus {
     }
 
     public enum CustomSeries {
-        CUSTOM_ERROR(6);
+        REFRESH_TOKEN_EXPIRED(6);
 
         private final int value;
 

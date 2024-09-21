@@ -1,5 +1,6 @@
 package com.gamelink.backend.domain.user.service.impl;
 
+import com.gamelink.backend.domain.user.exception.RefreshTokenExpiredException;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseToken;
 import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.domain.user.service.UserService;
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseToken reissue(String refreshToken) {
         if(!jwtProvider.validateRefreshToken(refreshToken)) {
-            throw new InvalidTokenException();
+            throw new RefreshTokenExpiredException();
         }
         String accessToken = tokenRepository.findAccessToken(refreshToken);
         JwtAuthenticationToken newToken = jwtProvider.reissue(accessToken);
