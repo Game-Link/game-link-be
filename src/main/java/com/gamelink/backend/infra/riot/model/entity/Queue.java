@@ -1,6 +1,7 @@
 package com.gamelink.backend.infra.riot.model.entity;
 
 import com.gamelink.backend.global.base.BaseEntity;
+import com.gamelink.backend.infra.riot.model.dto.response.LeagueEntryDto;
 import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
 import com.gamelink.backend.infra.riot.model.entity.queuetype.TeamRank;
 import jakarta.persistence.*;
@@ -62,6 +63,16 @@ public abstract class Queue extends BaseEntity {
 
         this.riotUser = finalRiotUser;
         this.riotUser.getQueues().add(this);
+    }
+
+    public void changeInfo(LeagueEntryDto dto) {
+        this.leaguePoints = dto.getLeaguePoints();
+        this.wins = dto.getWins();
+        this.losses = dto.getLosses();
+        this.veteran = dto.isVeteran();
+        this.inactive = dto.isInactive();
+        this.freshBlood = dto.isFreshBlood();
+        this.hotStreak = dto.isHotStreak();
     }
 
     public boolean isSoloRank() {

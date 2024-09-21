@@ -8,10 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Schema(description = "소환사 정보")
 public class ResponseSummonerInfoDto {
+
+    @Schema(description = "유저 ID")
+    private final UUID userId;
 
     @Schema(description = "게임 아이디")
     private final String puuid;
@@ -41,6 +45,7 @@ public class ResponseSummonerInfoDto {
     private final ResponseSummonerTeamRankDto teamRank;
 
     public ResponseSummonerInfoDto(RiotUser riotUser, ResponseSummonerSoloRankDto soloRank, ResponseSummonerTeamRankDto teamRank) {
+        this.userId = riotUser.getUser().getSubId();
         this.puuid = riotUser.getPuuid();
         this.summonerId = riotUser.getSummonerId();
         this.summonerName = riotUser.getSummonerName();

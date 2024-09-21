@@ -46,4 +46,15 @@ public class RiotAccountController {
     public ResponseSummonerInfoDto getRiotUserInfo(AppAuthentication auth) {
         return riotAccountService.getRiotUserInfo(UUID.fromString(auth.getUserSubId()));
     }
+
+    /**
+     * Riot 계정 정보 새로고침
+     *
+     * <p>Riot의 사용자 계정 정보를 새로고침하는 API입니다.</p>
+     */
+    @PatchMapping("/refresh")
+    public void refreshRiotAccountInfo(@RequestParam UUID userId) {
+        riotAccountService.refreshRiotAccountInfo(userId);
+    }
+
 }

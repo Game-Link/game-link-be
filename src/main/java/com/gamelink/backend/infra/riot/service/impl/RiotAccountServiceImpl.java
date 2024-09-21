@@ -1,15 +1,10 @@
 package com.gamelink.backend.infra.riot.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gamelink.backend.domain.user.exception.UserNotFoundException;
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.domain.user.repository.UserRepository;
-import com.gamelink.backend.infra.riot.exception.ParameterNotFoundException;
-import com.gamelink.backend.infra.riot.exception.RiotUserNotFoundException;
-import com.gamelink.backend.infra.riot.exception.RiotUserNotMatchException;
-import com.gamelink.backend.infra.riot.exception.UriErrorException;
+import com.gamelink.backend.infra.riot.exception.*;
 import com.gamelink.backend.infra.riot.model.dto.response.*;
-import com.gamelink.backend.infra.riot.model.entity.Queue;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
 import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
 import com.gamelink.backend.infra.riot.model.entity.queuetype.TeamRank;
@@ -20,17 +15,9 @@ import com.gamelink.backend.infra.riot.service.RiotAccountService;
 import com.gamelink.backend.infra.riot.service.RiotOpenApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -99,5 +86,33 @@ public class RiotAccountServiceImpl implements RiotAccountService {
                 soloRankDtos[0],
                 teamRankDtos[0]
         );
+    }
+
+    @Override
+    @Transactional
+    public void refreshRiotAccountInfo(UUID userSubId) {
+        RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
+                .orElseThrow(RiotUserNotFoundException::new);
+        SoloRank soloRank = soloRankRepository.findOneByRiotUserSubId(riotUser.getSubId())
+                .orElseThrow(SoloRankNotFoundException::new);
+        TeamRank teamRank = teamRankRepository.findOneByRiotUserSubId(riotUser.getSubId())
+                .orElseThrow(TeamRankNotFoundException::new);
+
+        AccountDto accountDto = openApiService.getAccountDto(riotUser.getSummonerName(), riotUser.getSummonerTag());
+        SummonerDto summonerDto = openApiService.getSummonerDto(accountDto.getPuuid());
+
+        riotUser.changeInfo(accountDto, summonerDto);
+        openApiService.getLeagueInfo(riotUser).forEach(dto -> {
+            switch (dto.getQueueType()) {
+                case "RANKED_SOLO_5x5":
+                    soloRank.changeInfo(dto);
+                    break;
+                case "RANKED_FLEX_SR":
+                    teamRank.changeInfo(dto);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 }

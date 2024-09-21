@@ -26,6 +26,12 @@ public class SoloRank extends Queue {
         this.rankLevel = rankLevel;
     }
 
+    public void changeInfo(LeagueEntryDto dto) {
+        super.changeInfo(dto);
+        this.tier = dto.getTier();
+        this.rankLevel = dto.getRank();
+    }
+
     public static SoloRank convertFromLeagueEntryDto(RiotUser riotUser, LeagueEntryDto dto) {
         return new SoloRank(
                 riotUser,

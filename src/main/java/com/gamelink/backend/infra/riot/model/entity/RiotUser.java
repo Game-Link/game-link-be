@@ -58,6 +58,19 @@ public class RiotUser extends BaseEntity {
         this.summonerLevel = summonerLevel;
     }
 
+    /**
+     * RiotUser 정보 변경
+     */
+    public void changeInfo(AccountDto accountDto, SummonerDto summonerDto) {
+        this.puuid = accountDto.getPuuid();
+        this.summonerId = summonerDto.getId();
+        this.summonerName = accountDto.getGameName();
+        this.summonerTag = accountDto.getTagLine();
+        this.profileIconId = summonerDto.getProfileIconId();
+        this.revisionDate = LocalDateTime.now();
+        this.summonerLevel = summonerDto.getSummonerLevel();
+    }
+
     public static RiotUser convertFromAccountAndSummonerDto(User user, AccountDto accountDto, SummonerDto summonerDto) {
         return new RiotUser(
                 user,

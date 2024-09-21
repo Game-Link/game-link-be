@@ -8,4 +8,6 @@ public interface RiotAccountService {
     ResponseSummonerInfoDto getRiotUserInfo(UUID userSubId);
 
     void registerRiotAccountInfo(String gameName, String tagLine, UUID userSubId);
+
+    void refreshRiotAccountInfo(UUID userSubId);
 }

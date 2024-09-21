@@ -26,6 +26,12 @@ public class TeamRank extends Queue {
         this.rankLevel = rankLevel;
     }
 
+    public void changeInfo(LeagueEntryDto dto) {
+        super.changeInfo(dto);
+        this.tier = dto.getTier();
+        this.rankLevel = dto.getRank();
+    }
+
     public static TeamRank convertFromLeagueEntryDto(RiotUser finalRiotUser, LeagueEntryDto dto) {
         return new TeamRank(
                 finalRiotUser,
