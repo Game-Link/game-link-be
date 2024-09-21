@@ -44,8 +44,8 @@ public class RiotUser extends BaseEntity {
     @NotNull
     private Long summonerLevel;
 
-    @OneToMany(mappedBy = "riotUser", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Queue> queues = new ArrayList<>();
+    @OneToMany(mappedBy = "riotUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RankQueue> queues = new ArrayList<>();
 
     public RiotUser(User user, String puuid, String summonerId, String summonerName, String summonerTag, int profileIconId, LocalDateTime revisionDate, Long summonerLevel) {
         this.user = user;

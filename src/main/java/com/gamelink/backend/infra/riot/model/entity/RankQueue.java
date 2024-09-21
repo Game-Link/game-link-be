@@ -1,31 +1,36 @@
 package com.gamelink.backend.infra.riot.model.entity;
 
 import com.gamelink.backend.global.base.BaseEntity;
+import com.gamelink.backend.infra.riot.model.RankQueueStatus;
+import com.gamelink.backend.infra.riot.model.RankType;
 import com.gamelink.backend.infra.riot.model.dto.response.LeagueEntryDto;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.TeamRank;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Getter
 @Entity
-@DynamicUpdate
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type")
-@Table(name = "queue_type")
+@Table(name = "rank_queue")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class Queue extends BaseEntity {
+public class RankQueue extends BaseEntity {
 
     @JoinColumn(name = "riot_user_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private RiotUser riotUser;
 
+    @Enumerated(STRING)
+    private RankType rankType;
+
     @NotNull
     private int leaguePoints;
+
+    private String tier;
+
+    private String rankLevel;
 
     @NotNull
     private int wins;
@@ -45,15 +50,38 @@ public abstract class Queue extends BaseEntity {
     @NotNull
     private boolean hotStreak;
 
-    public Queue(RiotUser riotUser, int leaguePoints, int wins, int losses, boolean veteran, boolean inactive, boolean freshBlood, boolean hotStreak) {
+    @Enumerated(STRING)
+    private RankQueueStatus status;
+
+    public RankQueue(RiotUser riotUser, RankType rankType, int leaguePoints, String tier, String rankLevel, int wins, int losses, boolean veteran, boolean inactive, boolean freshBlood, boolean hotStreak) {
         this.riotUser = riotUser;
+        this.rankType = rankType;
         this.leaguePoints = leaguePoints;
+        this.tier = tier;
+        this.rankLevel = rankLevel;
         this.wins = wins;
         this.losses = losses;
         this.veteran = veteran;
         this.inactive = inactive;
         this.freshBlood = freshBlood;
         this.hotStreak = hotStreak;
+        this.status = RankQueueStatus.ACTIVE;
+    }
+
+    public static RankQueue convertFromLeagueEntryDto(RiotUser riotUser, LeagueEntryDto dto) {
+        return new RankQueue(
+                riotUser,
+                dto.getQueueType().equals("RANKED_SOLO_5x5") ? RankType.SOLO_RANK : RankType.TEAM_RANK,
+                dto.getLeaguePoints(),
+                dto.getTier(),
+                dto.getRank(),
+                dto.getWins(),
+                dto.getLosses(),
+                dto.isVeteran(),
+                dto.isInactive(),
+                dto.isFreshBlood(),
+                dto.isHotStreak()
+        );
     }
 
     public void changeRiotUser(RiotUser finalRiotUser) {
@@ -76,10 +104,18 @@ public abstract class Queue extends BaseEntity {
     }
 
     public boolean isSoloRank() {
-        return this instanceof SoloRank;
+        return this.rankType == RankType.SOLO_RANK;
     }
 
     public boolean isTeamRank() {
-        return this instanceof TeamRank;
+        return this.rankType == RankType.TEAM_RANK;
+    }
+
+    public void changeToInactive() {
+        this.status = RankQueueStatus.INACTIVE;
+    }
+
+    public boolean isActive() {
+        return this.status == RankQueueStatus.ACTIVE;
     }
 }
