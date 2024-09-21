@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface CustomRiotUserRepository {
     Optional<RiotUser> findOneByUserSubId(UUID userSubId);
+
+    Optional<RiotUser> findOneByGameNameAndTagLine(String gameName, String tagLine);
 }

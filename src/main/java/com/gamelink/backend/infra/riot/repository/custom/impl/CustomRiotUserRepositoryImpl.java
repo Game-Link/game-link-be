@@ -36,4 +36,23 @@ public class CustomRiotUserRepositoryImpl implements CustomRiotUserRepository {
             return Optional.of(riotUsers.get(0));
         }
     }
+
+    @Override
+    public Optional<RiotUser> findOneByGameNameAndTagLine(String gameName, String tagLine) {
+        List<RiotUser> riotUsers = entityManager.createQuery(
+                "select ru from RiotUser ru where ru.summonerName = :gameName and ru.summonerTag = :tagLine",
+                RiotUser.class
+        )
+                .setParameter("gameName", gameName)
+                .setParameter("tagLine", tagLine)
+                .getResultList();
+
+        if (riotUsers.size() > 1) {
+            throw new NotSingleResultException();
+        } else if (riotUsers.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(riotUsers.get(0));
+        }
+    }
 }
