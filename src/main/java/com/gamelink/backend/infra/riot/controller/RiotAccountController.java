@@ -57,4 +57,16 @@ public class RiotAccountController {
         riotAccountService.refreshRiotAccountInfo(userId);
     }
 
+    /**
+     * Riot 계정 아이디 / 태그 변경
+     *
+     * <p>둘 중에 하나만 입력되고 변경 가능합니다.</p>
+     */
+    @PatchMapping
+    @UserAuth
+    public void changeRiotAccountInfo(@Valid @RequestBody RequestRiotAccountDto request,
+                                      AppAuthentication auth) {
+        riotAccountService.changeRiotAccountInfo(request.getGameName(), request.getTagLine(), UUID.fromString(auth.getUserSubId()));
+    }
+
 }

@@ -2,8 +2,6 @@ package com.gamelink.backend.infra.riot.model.dto.response;
 
 import com.gamelink.backend.global.util.TimeUtil;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
-import com.gamelink.backend.infra.riot.model.entity.queuetype.TeamRank;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

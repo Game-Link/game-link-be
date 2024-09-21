@@ -1,6 +1,6 @@
 package com.gamelink.backend.infra.riot.model.dto.response;
 
-import com.gamelink.backend.infra.riot.model.entity.queuetype.SoloRank;
+import com.gamelink.backend.infra.riot.model.entity.RankQueue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -35,15 +35,15 @@ public class ResponseSummonerSoloRankDto {
     @Schema(description = "연승 여부")
     private final boolean hotStreak;
 
-    public ResponseSummonerSoloRankDto(SoloRank soloRank) {
-        this.tier = soloRank.getTier();
-        this.rank = soloRank.getRankLevel();
-        this.leaguePoints = soloRank.getLeaguePoints();
-        this.wins = soloRank.getWins();
-        this.losses = soloRank.getLosses();
-        this.veteran = soloRank.isVeteran();
-        this.inactive = soloRank.isInactive();
-        this.freshBlood = soloRank.isFreshBlood();
-        this.hotStreak = soloRank.isHotStreak();
+    public ResponseSummonerSoloRankDto(RankQueue rankQueue) {
+        this.tier = rankQueue.getTier();
+        this.rank = rankQueue.getRankLevel();
+        this.leaguePoints = rankQueue.getLeaguePoints();
+        this.wins = rankQueue.getWins();
+        this.losses = rankQueue.getLosses();
+        this.veteran = rankQueue.isVeteran();
+        this.inactive = rankQueue.isInactive();
+        this.freshBlood = rankQueue.isFreshBlood();
+        this.hotStreak = rankQueue.isHotStreak();
     }
 }
