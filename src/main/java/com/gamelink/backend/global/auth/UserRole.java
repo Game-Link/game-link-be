@@ -23,7 +23,7 @@ public enum UserRole {
     }
 
     public static final Map<String, UserRole> BY_LABEL =
-            Stream.of(values()).collect(Collectors.toMap(UserRole::getName, e -> e));
+            Stream.of(values()).collect(Collectors.toMap(UserRole::name, e -> e));
 
     public static UserRole of(String name) {
         return BY_LABEL.get(name);

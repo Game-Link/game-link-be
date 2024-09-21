@@ -3,7 +3,6 @@ package com.gamelink.backend.global.auth.jwt;
 import com.gamelink.backend.domain.user.model.UserStatus;
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.global.auth.UserRole;
-import com.gamelink.backend.global.auth.jwt.exception.IllegalTokenException;
 import com.gamelink.backend.global.auth.jwt.exception.InvalidTokenException;
 import com.gamelink.backend.global.auth.jwt.repository.TokenRepository;
 import com.gamelink.backend.global.auth.model.JwtToken;
@@ -14,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -106,7 +104,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
     public JwtAuthenticationToken reissue(String accessToken) {
         String newAccessToken = refreshAccessToken(accessToken);
         String newRefreshToken = createRefreshToken();
-        Jws<Claims> claimsJws = validateToken(accessToken);
+        Jws<Claims> claimsJws = validateToken(newAccessToken);
         String userSubId = (String) claimsJws.getBody().get("userSubId");
         tokenRepository.updateJwtToken(userSubId, newAccessToken, newRefreshToken);
 
@@ -121,17 +119,27 @@ public class JwtProvider implements AuthenticationTokenProvider {
         UserRole role;
         UserStatus userStatus;
         try {
-            Jws<Claims> claimsJws = validateToken(accessToken);
-            Claims body = claimsJws.getBody();
+            Claims body = getClaimsFromToken(accessToken);
             userSubId = (String) body.get("userSubId");
             role = UserRole.of((String) body.get("userRole"));
             userStatus = UserStatus.valueOf((String) body.get("userStatus"));
-        } catch (ExpiredJwtException e) {
-            userSubId = (String) e.getClaims().get("userSubId");
-            role = UserRole.of((String) e.getClaims().get("userRole"));
-            userStatus = UserStatus.valueOf((String) e.getClaims().get("userStatus"));
+        } catch (JwtException e) {
+            throw new InvalidTokenException();
         }
         return createAccessToken(userSubId, role, userStatus);
+    }
+
+    private Claims getClaimsFromToken(String accessToken) {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .setSigningKey(secretKey.getBytes())
+                    .parseClaimsJws(accessToken);
+            return claimsJws.getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        } catch (JwtException e) {
+            throw new InvalidTokenException();
+        }
     }
 
     private String createAccessToken(String userSubId, UserRole role, UserStatus status) {
