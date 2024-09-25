@@ -1,4 +1,4 @@
-package com.gamelink.backend.global.config;
+package com.gamelink.backend.global.config.aws;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -24,13 +24,13 @@ import java.util.Date;
         includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 public class DynamoDBConfig {
 
-    @Value("${aws.dynamodb.access-key}")
+    @Value("${aws.credentials.access-key}")
     private String accessKey;
 
-    @Value("${aws.dynamodb.secret-key}")
+    @Value("${aws.credentials.secret-key}")
     private String secretKey;
 
-    @Value("${aws.dynamodb.region}")
+    @Value("${aws.credentials.region}")
     private String region;
 
     public AWSCredentials amazonAWSCredentials() {

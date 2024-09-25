@@ -27,7 +27,6 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String ACCESS_PREFIX = "gamelink-access";
-    public static final String REFRESH_PREFIX = "gamelink-refresh";
 
     @Value("${app.auth.jwt.access-expiration}")
     private Duration accessExpiration;
