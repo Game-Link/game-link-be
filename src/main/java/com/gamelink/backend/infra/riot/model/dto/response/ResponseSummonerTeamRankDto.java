@@ -8,6 +8,9 @@ import lombok.Getter;
 @Schema(description = "소환사 팀 랭크 정보")
 public class ResponseSummonerTeamRankDto {
 
+    @Schema(description = "티어 이미지 Url")
+    private final String rankImageUrl;
+
     @Schema(description = "티어")
     private final String tier;
 
@@ -35,7 +38,8 @@ public class ResponseSummonerTeamRankDto {
     @Schema(description = "연승 여부")
     private final boolean hotStreak;
 
-    public ResponseSummonerTeamRankDto(RankQueue rankQueue) {
+    public ResponseSummonerTeamRankDto(RankQueue rankQueue, String rankImageUrl) {
+        this.rankImageUrl = rankImageUrl;
         this.tier = rankQueue.getTier();
         this.rank = rankQueue.getRankLevel();
         this.leaguePoints = rankQueue.getLeaguePoints();

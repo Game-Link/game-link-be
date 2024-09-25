@@ -27,8 +27,8 @@ public class ResponseSummonerInfoDto {
     @Schema(description = "소환사 태그")
     private final String summonerTag;
 
-    @Schema(description = "소환사 아이콘 아이디")
-    private final int profileIconId;
+    @Schema(description = "소환사 아이콘 이미지 Url")
+    private final String profileUrl;
 
     @Schema(description = "소환사의 마지막 수정날짜")
     private final  LocalDateTime revisionDate;
@@ -42,13 +42,13 @@ public class ResponseSummonerInfoDto {
     @Schema(description = "소환사 팀 랭크 정보")
     private final ResponseSummonerTeamRankDto teamRank;
 
-    public ResponseSummonerInfoDto(RiotUser riotUser, ResponseSummonerSoloRankDto soloRank, ResponseSummonerTeamRankDto teamRank) {
+    public ResponseSummonerInfoDto(RiotUser riotUser, ResponseSummonerSoloRankDto soloRank, ResponseSummonerTeamRankDto teamRank, String profileUrl) {
         this.userId = riotUser.getUser().getSubId();
         this.puuid = riotUser.getPuuid();
         this.summonerId = riotUser.getSummonerId();
         this.summonerName = riotUser.getSummonerName();
         this.summonerTag = riotUser.getSummonerTag();
-        this.profileIconId = riotUser.getProfileIconId();
+        this.profileUrl = profileUrl;
         this.revisionDate = riotUser.getRevisionDate();
         this.summonerLevel = riotUser.getSummonerLevel();
         this.soloRank = soloRank;

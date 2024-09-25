@@ -2,6 +2,8 @@ package com.gamelink.backend.infra.riot.controller;
 
 import com.gamelink.backend.global.auth.jwt.AppAuthentication;
 import com.gamelink.backend.global.auth.role.UserAuth;
+import com.gamelink.backend.infra.riot.model.dto.MatchDto;
+import com.gamelink.backend.infra.riot.model.dto.ParticipantDto;
 import com.gamelink.backend.infra.riot.model.dto.request.RequestRiotAccountDto;
 import com.gamelink.backend.infra.riot.model.dto.response.ResponseSummonerInfoDto;
 import com.gamelink.backend.infra.riot.service.RiotAccountService;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -69,4 +73,12 @@ public class RiotAccountController {
         riotAccountService.changeRiotAccountInfo(request.getGameName(), request.getTagLine(), UUID.fromString(auth.getUserSubId()));
     }
 
+    /**
+     * Riot 계정 전적 정보 조회
+     */
+    @GetMapping("/match")
+    @UserAuth
+    public void getRiotMatchInfo(AppAuthentication auth) {
+        List<MatchDto> riotMatchInfo = riotAccountService.getRiotMatchInfo(UUID.fromString(auth.getUserSubId()));
+    }
 }
