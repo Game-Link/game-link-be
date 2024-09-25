@@ -2,8 +2,8 @@ package com.gamelink.backend.infra.riot.model.entity;
 
 import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.global.base.BaseEntity;
-import com.gamelink.backend.infra.riot.model.dto.response.AccountDto;
-import com.gamelink.backend.infra.riot.model.dto.response.SummonerDto;
+import com.gamelink.backend.infra.riot.model.dto.AccountDto;
+import com.gamelink.backend.infra.riot.model.dto.SummonerDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;

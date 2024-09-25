@@ -1,10 +1,13 @@
 package com.gamelink.backend.infra.riot.service;
 
-import com.gamelink.backend.infra.riot.model.dto.response.AccountDto;
-import com.gamelink.backend.infra.riot.model.dto.response.LeagueEntryDto;
-import com.gamelink.backend.infra.riot.model.dto.response.SummonerDto;
+import com.gamelink.backend.infra.riot.model.dto.AccountDto;
+import com.gamelink.backend.infra.riot.model.dto.LeagueEntryDto;
+import com.gamelink.backend.infra.riot.model.dto.MatchDto;
+import com.gamelink.backend.infra.riot.model.dto.SummonerDto;
+import com.gamelink.backend.infra.riot.model.entity.RankQueue;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
 
+import java.util.List;
 import java.util.Set;
 
 public interface RiotOpenApiService {
@@ -13,4 +16,10 @@ public interface RiotOpenApiService {
     SummonerDto getSummonerDto(String puuid);
 
     Set<LeagueEntryDto> getLeagueInfo(RiotUser riotUser);
+
+    String getProfileUrl(int profileIconId);
+
+    String getRankImageUrl(RankQueue rankQueue);
+
+    List<MatchDto> getMatchList(String puuid);
 }

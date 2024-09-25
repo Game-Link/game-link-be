@@ -1,7 +1,9 @@
 package com.gamelink.backend.infra.riot.service;
 
+import com.gamelink.backend.infra.riot.model.dto.MatchDto;
 import com.gamelink.backend.infra.riot.model.dto.response.ResponseSummonerInfoDto;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RiotAccountService {
@@ -12,4 +14,6 @@ public interface RiotAccountService {
     void refreshRiotAccountInfo(UUID userSubId);
 
     void changeRiotAccountInfo(String gameName, String tagLine, UUID userSubId);
+
+    List<MatchDto> getRiotMatchInfo(UUID userSubId);
 }

@@ -5,6 +5,7 @@ import com.gamelink.backend.domain.user.model.entity.User;
 import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.infra.riot.exception.*;
 import com.gamelink.backend.infra.riot.model.RankType;
+import com.gamelink.backend.infra.riot.model.dto.*;
 import com.gamelink.backend.infra.riot.model.dto.response.*;
 import com.gamelink.backend.infra.riot.model.entity.RankQueue;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
@@ -66,12 +67,21 @@ public class RiotAccountServiceImpl implements RiotAccountService {
             throw new RiotUserNotMatchException();
         }
 
+        String profileUrl = openApiService.getProfileUrl(riotUser.getProfileIconId());
+
         return new ResponseSummonerInfoDto(
                 riotUser,
                 riotUser.getQueues().stream().filter(RankQueue::isSoloRank).filter(RankQueue::isActive)
-                        .findFirst().map(ResponseSummonerSoloRankDto::new).orElse(null),
+                        .findFirst().map(rq -> {
+                            String rankImageUrl = openApiService.getRankImageUrl(rq);
+                            return new ResponseSummonerSoloRankDto(rq, rankImageUrl);
+                        }).orElse(null),
                 riotUser.getQueues().stream().filter(RankQueue::isTeamRank).filter(RankQueue::isActive)
-                        .findFirst().map(ResponseSummonerTeamRankDto::new).orElse(null)
+                        .findFirst().map(rq -> {
+                            String rankImageUrl = openApiService.getRankImageUrl(rq);
+                            return new ResponseSummonerTeamRankDto(rq, rankImageUrl);
+                        }).orElse(null),
+                profileUrl
         );
     }
 
@@ -129,5 +139,13 @@ public class RiotAccountServiceImpl implements RiotAccountService {
             rankQueue.changeRiotUser(riotUser);
         });
         riotUserRepository.save(riotUser);
+    }
+
+    @Override
+    public List<MatchDto> getRiotMatchInfo(UUID userSubId) {
+        RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
+                .orElseThrow(RiotUserNotFoundException::new);
+
+        return openApiService.getMatchList(riotUser.getPuuid());
     }
 }

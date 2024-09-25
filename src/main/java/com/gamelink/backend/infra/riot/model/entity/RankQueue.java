@@ -3,7 +3,7 @@ package com.gamelink.backend.infra.riot.model.entity;
 import com.gamelink.backend.global.base.BaseEntity;
 import com.gamelink.backend.infra.riot.model.RankQueueStatus;
 import com.gamelink.backend.infra.riot.model.RankType;
-import com.gamelink.backend.infra.riot.model.dto.response.LeagueEntryDto;
+import com.gamelink.backend.infra.riot.model.dto.LeagueEntryDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
