@@ -1,4 +1,4 @@
-package com.gamelink.backend.global.config.jackson;
+package com.gamelink.backend.global.config.swagger.jackson;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;

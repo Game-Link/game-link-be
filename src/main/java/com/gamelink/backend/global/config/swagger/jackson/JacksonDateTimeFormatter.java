@@ -1,4 +1,4 @@
-package com.gamelink.backend.global.config.jackson;
+package com.gamelink.backend.global.config.swagger.jackson;
 
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;

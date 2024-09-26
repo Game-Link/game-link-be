@@ -1,25 +1,20 @@
-package com.gamelink.backend.global.config;
+package com.gamelink.backend.global.config.swagger;
 
 import com.gamelink.backend.global.auth.jwt.JwtProvider;
-import com.gamelink.backend.global.config.jackson.JacksonDateTimeFormatter;
+import com.gamelink.backend.global.config.swagger.jackson.JacksonDateTimeFormatter;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.DateTimeSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 @Configuration

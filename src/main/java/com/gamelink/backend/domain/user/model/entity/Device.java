@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Device extends BaseEntity {
 
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 
     private String uniqueId;

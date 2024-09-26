@@ -1,4 +1,4 @@
-package com.gamelink.backend.global.config.jackson;
+package com.gamelink.backend.global.config.swagger.jackson;
 
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
