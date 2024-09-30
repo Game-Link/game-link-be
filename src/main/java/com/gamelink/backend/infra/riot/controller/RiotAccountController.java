@@ -2,6 +2,7 @@ package com.gamelink.backend.infra.riot.controller;
 
 import com.gamelink.backend.global.auth.jwt.AppAuthentication;
 import com.gamelink.backend.global.auth.role.UserAuth;
+import com.gamelink.backend.infra.riot.model.dto.CacheMatchDataDto;
 import com.gamelink.backend.infra.riot.model.dto.MatchDto;
 import com.gamelink.backend.infra.riot.model.dto.ParticipantDto;
 import com.gamelink.backend.infra.riot.model.dto.request.RequestRiotAccountDto;
@@ -78,7 +79,7 @@ public class RiotAccountController {
      */
     @GetMapping("/match")
     @UserAuth
-    public void getRiotMatchInfo(AppAuthentication auth) {
-        List<MatchDto> riotMatchInfo = riotAccountService.getRiotMatchInfo(UUID.fromString(auth.getUserSubId()));
+    public List<CacheMatchDataDto> getRiotMatchInfo(AppAuthentication auth) {
+        return riotAccountService.getRiotMatchInfo(UUID.fromString(auth.getUserSubId()));
     }
 }

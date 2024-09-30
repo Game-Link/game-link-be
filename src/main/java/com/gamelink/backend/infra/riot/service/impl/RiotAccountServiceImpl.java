@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -142,10 +143,19 @@ public class RiotAccountServiceImpl implements RiotAccountService {
     }
 
     @Override
-    public List<MatchDto> getRiotMatchInfo(UUID userSubId) {
+    public List<CacheMatchDataDto> getRiotMatchInfo(UUID userSubId) {
         RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
                 .orElseThrow(RiotUserNotFoundException::new);
 
-        return openApiService.getMatchList(riotUser.getPuuid());
+        List<MatchDto> matchList = openApiService.getMatchList(riotUser.getPuuid());
+        List<CacheMatchDataDto> myData = new ArrayList<>();
+        matchList.forEach(matchDto -> {
+            matchDto.getInfo().getParticipants().forEach(participantDto -> {
+                if (participantDto.getPuuid().equals(riotUser.getPuuid())) {
+                    myData.add(new CacheMatchDataDto(matchDto, participantDto));
+                }
+            });
+        });
+        return myData;
     }
 }
