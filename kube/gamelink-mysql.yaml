@@ -28,14 +28,7 @@ spec:
               value: gamelink
           ports:
             - containerPort: 3306
-          volumeMounts:
-            - name: mysql-config
-              mountPath: /etc/mysql/conf.d
           args: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-      volumes:
-        - name: mysql-config
-          hostPath:
-            path: /home/ubuntu/db/mysql/conf.d
 ---
 apiVersion: v1
 kind: Service
