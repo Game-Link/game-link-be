@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamelink-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: gamelink-mysql
+  template:
+    metadata:
+      labels:
+        app: gamelink-mysql
+    spec:
+      containers:
+        - name: gamelink-mysql
+          image: mysql/mysql-server:8.0
+          env:
+            - name: MYSQL_ROOT_HOST
+              value: '%'
+            - name: MYSQL_DATABASE
+              value: gamelink
+            - name: MYSQL_ROOT_PASSWORD
+              value: rootpwd
+            - name: MYSQL_PASSWORD
+              value: rootpwd
+            - name: MYSQL_USER
+              value: gamelink
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d
+          args: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+      volumes:
+        - name: mysql-config
+          hostPath:
+            path: ../db/mysql/conf.d
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gamelink-mysql
+spec:
+  selector:
+    app: gamelink-mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

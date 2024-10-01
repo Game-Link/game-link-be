@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-server
+  labels:
+    app: spring-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-server
+  template:
+    metadata:
+      labels:
+        app: spring-server
+    spec:
+      containers:
+        - name: spring-server
+          image: gutanbug53/gamelink-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: "/src/main/resources/application.yml"
+          volumeMounts:
+            - name: config-volume
+              mountPath: "/src/main/resources/application.yml"
+              subPath: application.yml
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: spring-server-config

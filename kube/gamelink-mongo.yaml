@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamelink-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gamelink-mongo
+  template:
+    metadata:
+      labels:
+        app: gamelink-mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: gamelink
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: rootpwd
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          hostPath:
+            path: ./data/db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gamelink-mongo
+spec:
+  selector:
+    app: gamelink-mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
