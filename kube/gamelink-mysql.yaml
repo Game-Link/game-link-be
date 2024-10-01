@@ -35,7 +35,7 @@ spec:
       volumes:
         - name: mysql-config
           hostPath:
-            path: ../db/mysql/conf.d
+            path: /home/ubuntu/db/mysql/conf.d
 ---
 apiVersion: v1
 kind: Service

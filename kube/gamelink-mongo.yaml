@@ -28,7 +28,7 @@ spec:
       volumes:
         - name: mongo-data
           hostPath:
-            path: ./data/db
+            path: /home/ubuntu/data/db
 ---
 apiVersion: v1
 kind: Service
