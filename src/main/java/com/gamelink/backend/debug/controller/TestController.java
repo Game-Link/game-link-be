@@ -139,7 +139,7 @@ public class TestController {
     }
 
     /**
-     * ArgoCD rollout 확인
+     * ArgoCD rollout 확인하기 위한 API
      */
     @GetMapping("/argocd")
     public String testString() {
