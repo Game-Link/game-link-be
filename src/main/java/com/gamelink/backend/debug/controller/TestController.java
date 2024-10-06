@@ -138,6 +138,9 @@ public class TestController {
         return "accessToken : " + accessToken;
     }
 
+    /**
+     * Argocd 연동 테스트용 API
+     */
     @GetMapping
     public String testString() {
         return "test";
