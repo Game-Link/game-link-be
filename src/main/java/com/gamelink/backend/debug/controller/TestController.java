@@ -141,7 +141,7 @@ public class TestController {
     /**
      * Argocd 연동 테스트용 API
      */
-    @GetMapping
+    @GetMapping("/argocd")
     public String testString() {
         return "test";
     }
