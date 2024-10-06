@@ -138,4 +138,9 @@ public class TestController {
         return "accessToken : " + accessToken;
     }
 
+    @GetMapping
+    public String testString() {
+        return "test";
+    }
+
 }
