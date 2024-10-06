@@ -44,13 +44,13 @@ jobs:
       env:
         IMAGE_NAME: ghcr.io/game-link/game-link-be
       run: |
-        docker build -t $IMAGE_NAME:%{GITHUB_SHA::7} -t IMAGE_NAME:latest .
+        docker build -t $IMAGE_NAME:${GITHUB_SHA::7} -t $IMAGE_NAME:latest .
     - name: Docker push to GHCR
       env:
         IMAGE_NAME: ghcr.io/game-link/game-link-be
         GITHUB_TOKEN: ${{ secrets.PAT }}
       run: |
-        echo $GITHUB_TOKEN | docker login ghcr.io -u ${{ github.actor}} --password-stdin
+        echo $GITHUB_TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         docker push $IMAGE_NAME:${GITHUB_SHA::7}
         docker push $IMAGE_NAME:latest
         
