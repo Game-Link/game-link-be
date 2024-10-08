@@ -105,11 +105,11 @@ public class RiotOpenApiServiceImpl implements RiotOpenApiService {
     }
 
     @Override
-    public List<MatchDto> getMatchList(String puuid) {
+    public List<MatchDto> getMatchInfoList(String puuid, int start) {
         List<MatchDto> matchInfoList = new ArrayList<>();
 
         List<String> matchIds = webClient.get()
-                .uri(asiaRequestUrl + "/lol/match/v5/matches/by-puuid/" + puuid + "/ids")
+                .uri(asiaRequestUrl + "/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=" + start + "&count=5")
                 .header("X-Riot-Token", apiKey)
                 .retrieve()
                 .bodyToFlux(String.class)
@@ -128,7 +128,21 @@ public class RiotOpenApiServiceImpl implements RiotOpenApiService {
         return matchInfoList;
     }
 
-    private MatchDto getMatchInfo(String matchId) {
+    @Override
+    public List<String> getMatchIdList(String puuid, int start, int count) {
+        List<String> matchIds = webClient.get()
+                .uri(asiaRequestUrl + "/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=" + start + "&count=" + count)
+                .header("X-Riot-Token", apiKey)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .collect(Collectors.toList())
+                .block();
+        String[] ids = matchIds.get(0).replaceAll("[\\[\\]\"]", "").split(",");
+        return Arrays.asList(ids);
+    }
+
+    @Override
+    public MatchDto getMatchInfo(String matchId) {
         return webClient.get()
                 .uri(asiaRequestUrl + "/lol/match/v5/matches/" + matchId)
                 .header("X-Riot-Token", apiKey)

@@ -1,9 +1,11 @@
-package com.gamelink.backend.infra.riot.model.dto;
+package com.gamelink.backend.infra.riot.model.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor  // final 필드들에 대한 생성자 자동 생성
 public class CacheMatchDataDto {
 
     @Schema(description = "매치 Id")
@@ -92,36 +94,4 @@ public class CacheMatchDataDto {
 
     @Schema(description = "킬 관여율")
     private final float killParticipation;
-
-    public CacheMatchDataDto(MatchDto matchDto, ParticipantDto participantDto) {
-        this.matchId = matchDto.getMetadata().getMatchId();
-        this.championName = participantDto.getChampionName();
-        this.doubleKills = participantDto.getDoubleKills();
-        this.firstBloodKill = participantDto.isFirstBloodKill();
-        this.teamPosition = participantDto.getTeamPosition();
-        this.pentaKills = participantDto.getPentaKills();
-        this.assists = participantDto.getAssists();
-        this.deaths = participantDto.getDeaths();
-        this.kills = participantDto.getKills();
-        this.kda = participantDto.getChallenges().getKda();
-        this.firstBloodAssist = participantDto.isFirstBloodAssist();
-        this.firstTowerAssist = participantDto.isFirstTowerAssist();
-        this.firstTowerKill = participantDto.isFirstTowerKill();
-        this.goldPerMinute = participantDto.getChallenges().getGoldPerMinute();
-        this.gameEndedInEarlySurrender = participantDto.isGameEndedInEarlySurrender();
-        this.gameEndedInSurrender = participantDto.isGameEndedInSurrender();
-        this.timePlayed = participantDto.getTimePlayed();
-        this.totalMinionsKilled = participantDto.getTotalMinionsKilled();
-        this.win = participantDto.isWin();
-        this.soloKills = participantDto.getChallenges().getSoloKills();
-        this.legendaryCount = participantDto.getChallenges().getLegendaryCount();
-        this.damagePerMinute = participantDto.getChallenges().getDamagePerMinute();
-        this.dragonTakedowns = participantDto.getChallenges().getDragonTakedowns();
-        this.epicMonsterSteals = participantDto.getChallenges().getEpicMonsterSteals();
-        this.baronTakedowns = participantDto.getChallenges().getBaronTakedowns();
-        this.voidMonsterKill = participantDto.getChallenges().getVoidMonsterKill();
-        this.perfectDragonSoulsTaken = participantDto.getChallenges().getPerfectDragonSoulsTaken();
-        this.elderDragonMultikills = participantDto.getChallenges().getElderDragonMultikills();
-        this.killParticipation = participantDto.getChallenges().getKillParticipation();
-    }
 }
