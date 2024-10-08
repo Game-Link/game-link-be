@@ -5,8 +5,13 @@ import com.gamelink.backend.domain.chat.model.entity.ChatRoom;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class ResponseCreateChatroom {
+
+    @Schema(description = "채팅방 Id")
+    private final UUID roomId;
 
     @Schema(description = "채팅방 이름", example = "채팅방")
     private final String roomName;
@@ -21,6 +26,7 @@ public class ResponseCreateChatroom {
     private final ChatRoomStatus status;
 
     public ResponseCreateChatroom(ChatRoom room) {
+        this.roomId = room.getSubId();
         this.roomName = room.getRoomName();
         this.maxUserCount = room.getMaxUserCount();
         this.userCount = room.getUserCount();
