@@ -54,7 +54,7 @@ jobs:
         REPO: ${{ secrets.DOCKER_REPO }}
       run: |
         docker login -u $USERNAME -p $PASSWORD
-        docker push $IMAGE_NAME:${GITHUB_SHA::7}
-        docker push $IMAGE_NAME:latest
+        docker push $USERNAME/$REPO:${GITHUB_SHA::7}
+        docker push $USERNAME/$REPO:latest
         
 
