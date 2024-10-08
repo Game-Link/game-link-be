@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 
 @Getter
 public class UploadedImage {
-    private final String fileId;
+    private final String imageId;
 
     private final String originalImageName;
 
@@ -13,8 +13,8 @@ public class UploadedImage {
 
     private final ImageRequest image;
 
-    public UploadedImage(String fileId, ImageRequest image) {
-        this.fileId = fileId;
+    public UploadedImage(String imageId, ImageRequest image) {
+        this.imageId = imageId;
         this.originalImageName = image.getOriginalImageName();
         this.mimeType = image.getContentType();
         this.image = image;
