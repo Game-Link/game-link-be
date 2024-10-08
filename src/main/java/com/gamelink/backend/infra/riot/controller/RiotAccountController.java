@@ -2,10 +2,8 @@ package com.gamelink.backend.infra.riot.controller;
 
 import com.gamelink.backend.global.auth.jwt.AppAuthentication;
 import com.gamelink.backend.global.auth.role.UserAuth;
-import com.gamelink.backend.infra.riot.model.dto.CacheMatchDataDto;
-import com.gamelink.backend.infra.riot.model.dto.MatchDto;
-import com.gamelink.backend.infra.riot.model.dto.ParticipantDto;
 import com.gamelink.backend.infra.riot.model.dto.request.RequestRiotAccountDto;
+import com.gamelink.backend.infra.riot.model.dto.response.CacheMatchDataDto;
 import com.gamelink.backend.infra.riot.model.dto.response.ResponseSummonerInfoDto;
 import com.gamelink.backend.infra.riot.service.RiotAccountService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,14 +37,13 @@ public class RiotAccountController {
     }
 
     /**
-     * 자신의 Riot 계정 정보 조회
+     * 자신의 Riot 계정 정보 조회 및 내 정보 조회
      *
-     * <p>게임 이름과 태그로 Riot 계정 정보 가져오기 </p>
+     * <p>자신의 Riot 계정 정보 및 내 정보를 조회할 수 있습니다.</p>
      * <p>Riot 계정 정보를 최신화하기 위해서는 새로고침 api를 호출해야합니다.</p>
      */
     @GetMapping
     @UserAuth
-    // TODO : profileId를 사진으로 대체하여 URL 링크로 변경해야함
     public ResponseSummonerInfoDto getRiotUserInfo(AppAuthentication auth) {
         return riotAccountService.getRiotUserInfo(UUID.fromString(auth.getUserSubId()));
     }
@@ -76,10 +72,24 @@ public class RiotAccountController {
 
     /**
      * Riot 계정 전적 정보 조회
+     *
+     * <p>start는 5의 배수로 Riot Api에서 매치Id를 가져올 위치를 지정합니다. ex)0, 5, 10, 15... </p>
      */
     @GetMapping("/match")
     @UserAuth
-    public List<CacheMatchDataDto> getRiotMatchInfo(AppAuthentication auth) {
-        return riotAccountService.getRiotMatchInfo(UUID.fromString(auth.getUserSubId()));
+    public List<CacheMatchDataDto> getRiotMatchInfo(AppAuthentication auth,
+                                                    @RequestParam(defaultValue = "0") int start) {
+        return riotAccountService.getRiotMatchInfo(UUID.fromString(auth.getUserSubId()), start);
+    }
+
+    /**
+     * Riot 계정 전적 정보 새로고침
+     *
+     * <p>중복되지 않은 최신 매치 데이터만을 새로고침하기 때문에 Riot 계정 전적 정보 조회 기능을 우선으로 호출해야 합니다.</p>
+     */
+    @PatchMapping("/match/refresh")
+    @UserAuth
+    public void refreshRiotMatchInfo(AppAuthentication auth) {
+        riotAccountService.refreshRiotMatchInfo(UUID.fromString(auth.getUserSubId()));
     }
 }
