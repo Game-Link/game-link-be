@@ -3,6 +3,8 @@ package com.gamelink.backend.global.config.redis;
 public class RedisKeys {
     public static final String KEY_DELIMITER = ":";
 
+    public static final String MATCH_ID_KEY = "match_id";
+
     public static String combine(Object key1, Object key2) {
         return key1 + KEY_DELIMITER + key2;
     }
