@@ -42,15 +42,18 @@ jobs:
 
     - name: Docker build
       env:
-        IMAGE_NAME: ghcr.io/game-link/game-link-be
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        REPO: ${{ secrets.DOCKER_REPO }}
       run: |
         docker build -t $IMAGE_NAME:${GITHUB_SHA::7} -t $IMAGE_NAME:latest .
-    - name: Docker push to GHCR
+        
+    - name: Docker push
       env:
-        IMAGE_NAME: ghcr.io/game-link/game-link-be
-        GITHUB_TOKEN: ${{ secrets.PAT }}
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        REPO: ${{ secrets.DOCKER_REPO }}
       run: |
-        echo $GITHUB_TOKEN | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker login -u $USERNAME -p $PASSWORD
         docker push $IMAGE_NAME:${GITHUB_SHA::7}
         docker push $IMAGE_NAME:latest
         
