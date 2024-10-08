@@ -25,7 +25,7 @@ import java.util.Map;
                 description = "GameLink RESTFUL API 제공"
         ),
         servers = {
-                @io.swagger.v3.oas.annotations.servers.Server(url = "https://gamelink.asia/api", description = "개발서버"),
+                @io.swagger.v3.oas.annotations.servers.Server(url = "https://dev.gamelink.asia/api", description = "개발서버"),
                 @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "로컬 서버")
         }
 )
