@@ -1,17 +1,22 @@
 package com.gamelink.backend.domain.user.controller;
 
+import com.gamelink.backend.domain.user.model.dto.request.RequestCreateUserProfileImage;
 import com.gamelink.backend.domain.user.model.dto.request.RequestKakaoOAuthLogin;
 import com.gamelink.backend.domain.user.model.dto.request.RequestReissue;
+import com.gamelink.backend.domain.user.model.dto.request.RequestUpdateUserProfileImage;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseOAuthLoginDto;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseToken;
 import com.gamelink.backend.domain.user.service.OAuthService;
 import com.gamelink.backend.domain.user.service.UserService;
+import com.gamelink.backend.global.auth.jwt.AppAuthentication;
+import com.gamelink.backend.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -22,6 +27,35 @@ public class UserController {
 
     private final UserService userService;
     private final OAuthService oAuthService;
+
+//    /**
+//     * 사용자 프로필 조회
+//     */
+//    @GetMapping("/profile/{userId}")
+//    @UserAuth
+//    public ResponseUserProfileDto getUserProfile(@PathVariable UUID userId) {
+//        return userService.getUserProfile(userId);
+//    }
+
+    /**
+     * 사용자 프로필 이미지 등록
+     */
+    @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @UserAuth
+    public void createUserProfile(@ModelAttribute RequestCreateUserProfileImage request,
+                                          AppAuthentication auth) {
+        userService.createUserProfileImage(request, UUID.fromString(auth.getUserSubId()));
+    }
+
+    /**
+     * 사용자 프로필 이미지 수정
+     */
+    @PatchMapping(value = "/profile/change", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @UserAuth
+    public void updateUserProfile(@ModelAttribute RequestUpdateUserProfileImage request,
+                                  AppAuthentication auth) {
+        userService.updateUserProfileImage(request, UUID.fromString(auth.getUserSubId()));
+    }
 
     /**
      * OAuth 로그인
