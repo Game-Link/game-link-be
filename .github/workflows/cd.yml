@@ -45,7 +45,7 @@ jobs:
         USERNAME: ${{ secrets.DOCKER_USERNAME }}
         REPO: ${{ secrets.DOCKER_REPO }}
       run: |
-        docker build -t $IMAGE_NAME:${GITHUB_SHA::7} -t $IMAGE_NAME:latest .
+        docker build -t $USERNAME/$REPO:${GITHUB_SHA::7} -t $USERNAME/$REPO:latest .
         
     - name: Docker push
       env:
