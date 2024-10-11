@@ -20,6 +20,12 @@ spec:
           env:
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: "gamelink-zookeeper:2181"
+            - name: KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS
+              value: "60000"
+            - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
+              value: "60000"
+            - name: KAFKA_ZOOKEEPER_RETRY_BACKOFF_MS
+              value: "1000"
             - name: KAFKA_ADVERTISED_LISTENERS
               value: "PLAINTEXT://223.130.128.201:30387"
             - name: KAFKA_LISTENERS
