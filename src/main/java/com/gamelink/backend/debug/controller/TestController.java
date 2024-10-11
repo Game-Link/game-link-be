@@ -78,33 +78,6 @@ public class TestController {
     }
 
     /**
-     * 카프카 메시지 전송 테스트
-     */
-    @PostMapping
-    public ResponseEntity<Void> sendMessage(@RequestParam String message) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        try {
-            String stringChat = objectMapper.writeValueAsString(message);
-            log.info("MessageSenderImpl Message -> String형 : " + stringChat);
-            kafkaTemplate.send("chatting", stringChat);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().build();
-    }
-
-    @KafkaListener(topics = "chatting", containerFactory = "kafkaConsumerContainerFactory")
-    public void receiveMessage(String stringChat) throws JsonProcessingException{
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        Message message = objectMapper.readValue(stringChat, Message.class);
-        log.info("MessageSenderImpl Message -> STring형: " + stringChat);
-    }
-
-    /**
      * 카카오 AccessToken 발급
      */
     @PostMapping("/kakao")
