@@ -73,7 +73,7 @@ public class OAuthServiceImpl implements OAuthService {
         }
         AuthenticationToken newToken = jwtProvider.issue(user);
         Device device = deviceRepository.findOneByUserSubId(user.getSubId()).orElseThrow(DeviceNotFoundException::new);
-        return new ResponseOAuthLoginDto(device, newToken);
+        return new ResponseOAuthLoginDto(user.getSubId(), device, newToken);
     }
 
     private JsonNode getUserResource(String accessToken, String registrationId) {

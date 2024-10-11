@@ -6,8 +6,13 @@ import com.gamelink.backend.global.auth.jwt.AuthenticationToken;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class ResponseOAuthLoginDto {
+
+    @Schema(description = "유저 Id")
+    private final UUID userId;
 
     @Schema(description = "액세스 토큰")
     private final String accessToken;
@@ -18,7 +23,8 @@ public class ResponseOAuthLoginDto {
     @Schema(description = "사용자 기기 Id")
     private final String uniqueId;
 
-    public ResponseOAuthLoginDto(Device device, AuthenticationToken token) {
+    public ResponseOAuthLoginDto(UUID userId, Device device, AuthenticationToken token) {
+        this.userId = userId;
         this.accessToken = token.getAccessToken();
         this.refreshToken = token.getRefreshToken();
         this.uniqueId = device.getUniqueId();
