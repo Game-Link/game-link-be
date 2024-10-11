@@ -6,6 +6,9 @@ import com.gamelink.backend.domain.chat.service.ChatService;
 import com.gamelink.backend.domain.chat.service.MessageSender;
 import com.gamelink.backend.domain.chat_message.model.entity.ChatRoomMessage;
 import com.gamelink.backend.domain.chat_message.service.ChatRoomMessageService;
+import com.gamelink.backend.domain.user.exception.UserNotFoundException;
+import com.gamelink.backend.domain.user.model.entity.User;
+import com.gamelink.backend.domain.user.repository.UserRepository;
 import com.gamelink.backend.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ public class ChatController {
 
     private final ChatService chatService;
     private final ChatRoomMessageService chatRoomMessageService;
+    private final UserRepository userRepository;
     private final MessageSender sender;
 
     /**
@@ -50,13 +54,16 @@ public class ChatController {
         if (!chatService.alreadyInRoom(request.getRoomId(), request.getUserSubId())) {
             chatService.plusUserCount(request.getRoomId());
 
-            String nickname = chatService.addUserToRoom(request.getRoomId(), request.getSender());
+            User user = userRepository.findOneBySubId(request.getUserSubId())
+                    .orElseThrow(UserNotFoundException::new);
 
-            String enterMessage = request.getSender() + " 님이 입장하였습니다.";
+            String nickname = chatService.addUserToRoom(request.getRoomId(), user.getNickname());
+
+            String enterMessage = user.getNickname() + " 님이 입장하였습니다.";
             LocalDateTime messageTime = LocalDateTime.now();
 
             chatRoomMessageService.create(request.getRoomId(), request.getType().toString(),
-                    request.getUserSubId(), request.getSender(), enterMessage, messageTime, "", "", request.getFileType().toString());
+                    request.getUserSubId(), user.getNickname(), enterMessage, messageTime, "", "", request.getFileType().toString());
 
             Message message = Message.builder()
                     .type(request.getType())

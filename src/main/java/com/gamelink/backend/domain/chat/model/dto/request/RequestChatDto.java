@@ -17,8 +17,6 @@ public class RequestChatDto {
 
     private final UUID userSubId;
 
-    private final String sender;
-
     private final String message;
 
     private final String fileName;
