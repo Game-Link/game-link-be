@@ -86,13 +86,16 @@ public class ChatController {
     public void sendMessage(@Payload RequestChatDto request) {
         LocalDateTime messageTime = LocalDateTime.now();
 
+        User user = userRepository.findOneBySubId(request.getUserSubId())
+                .orElseThrow(UserNotFoundException::new);
+
         chatRoomMessageService.create(request.getRoomId(), request.getType().toString(),
-                request.getUserSubId(), request.getSender(), request.getMessage(), messageTime, request.getFileName(), request.getFileUrl(), request.getFileType().toString());
+                request.getUserSubId(), user.getNickname(), request.getMessage(), messageTime, request.getFileName(), request.getFileUrl(), request.getFileType().toString());
 
         Message message = Message.builder()
                 .type(request.getType())
                 .roomSubId(request.getRoomId())
-                .sender(request.getSender())
+                .sender(user.getNickname())
                 .message(request.getMessage())
                 .messageTime(messageTime)
                 .fileName(request.getFileName())
