@@ -2,7 +2,7 @@ package com.gamelink.backend.domain.chat_message.model.entity;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.gamelink.backend.domain.chat_message.model.ChatRoomMessageId;
-import com.gamelink.backend.global.config.aws.DynamoDBConfig;
+import com.gamelink.backend.global.config.DynamoDBConfig;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

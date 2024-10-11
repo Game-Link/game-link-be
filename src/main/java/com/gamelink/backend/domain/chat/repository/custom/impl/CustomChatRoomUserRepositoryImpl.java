@@ -20,10 +20,10 @@ public class CustomChatRoomUserRepositoryImpl implements CustomChatRoomUserRepos
 
     @Override
     public boolean existsUserByRoomIdAndUserSubId(UUID roomSubId, UUID userSubId) {
-        List<Boolean> results = entityManager.createQuery(
+        List<ChatRoomUser> results = entityManager.createQuery(
                 "select cru from ChatRoomUser cru where " +
                         "cru.chatRoom.subId = :chatRoomId and " +
-                        "cru.participant.subId = :userSubId", Boolean.class
+                        "cru.participant.subId = :userSubId", ChatRoomUser.class
         )
                 .setParameter("chatRoomId", roomSubId)
                 .setParameter("userSubId", userSubId)
