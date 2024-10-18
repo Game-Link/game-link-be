@@ -22,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -73,7 +75,8 @@ public class RiotAccountServiceImpl implements RiotAccountService {
             matchIdList.forEach(matchId -> matchIds.add(new MatchId(riotUser, matchId)));
         }
 
-        // 최근 20개의 매치 데이터를 조회하여 캐시에 저장
+        // 최근 20개의 매치 데이터를 조회하여 캐시에 저장 및 전적 데이터 재가공
+        // MultiValueMap : 챔피언 이름을 key로, value는 [게임 수, 승리 수, 패배 수, 킬 수, 데스 수, 어시스트 수]로 저장
         List<PersistMatchDataDto> cacheDatas = new ArrayList<>();
         int[] sumData = new int[7];
         Map<String, int[]> championData = new HashMap<>();

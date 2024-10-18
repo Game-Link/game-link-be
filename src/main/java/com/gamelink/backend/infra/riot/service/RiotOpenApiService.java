@@ -28,4 +28,6 @@ public interface RiotOpenApiService {
     List<String> getRankMatchIdList(String puuid, int start, int count);
 
     MatchDto getMatchInfo(String matchId);
+
+    String getChampionImageUrl(String championName);
 }

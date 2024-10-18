@@ -163,4 +163,9 @@ public class RiotOpenApiServiceImpl implements RiotOpenApiService {
                 .bodyToMono(MatchDto.class)
                 .block();
     }
+
+    @Override
+    public String getChampionImageUrl(String championName) {
+        return null;
+    }
 }

@@ -6,6 +6,7 @@ import com.gamelink.backend.domain.user.model.dto.request.RequestReissue;
 import com.gamelink.backend.domain.user.model.dto.request.RequestUpdateUserProfileImage;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseOAuthLoginDto;
 import com.gamelink.backend.domain.user.model.dto.response.ResponseToken;
+import com.gamelink.backend.domain.user.model.dto.response.ResponseUserProfileDto;
 import com.gamelink.backend.domain.user.service.OAuthService;
 import com.gamelink.backend.domain.user.service.UserService;
 import com.gamelink.backend.global.auth.jwt.AppAuthentication;
@@ -28,14 +29,14 @@ public class UserController {
     private final UserService userService;
     private final OAuthService oAuthService;
 
-//    /**
-//     * 사용자 프로필 조회
-//     */
-//    @GetMapping("/profile/{userId}")
-//    @UserAuth
-//    public ResponseUserProfileDto getUserProfile(@PathVariable UUID userId) {
-//        return userService.getUserProfile(userId);
-//    }
+    /**
+     * 사용자 프로필 조회
+     */
+    @GetMapping("/profile/{userId}")
+    @UserAuth
+    public ResponseUserProfileDto getUserProfile(@PathVariable UUID userId) {
+        return userService.getUserProfile(userId);
+    }
 
     /**
      * 사용자 프로필 이미지 등록
