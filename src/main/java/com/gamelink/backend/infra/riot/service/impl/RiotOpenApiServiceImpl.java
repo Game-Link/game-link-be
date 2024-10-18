@@ -142,6 +142,19 @@ public class RiotOpenApiServiceImpl implements RiotOpenApiService {
     }
 
     @Override
+    public List<String> getRankMatchIdList(String puuid, int start, int count) {
+        List<String> rankMatchIds = webClient.get()
+                .uri(asiaRequestUrl + "/lol/match/v5/matches/by-puuid/" + puuid + "/ids?type=ranked&start=" + start + "&count=" + count)
+                .header("X-Riot-Token", apiKey)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .collect(Collectors.toList())
+                .block();
+        String[] rankIds = rankMatchIds.get(0).replaceAll("[\\[\\]\"]", "").split(",");
+        return Arrays.asList(rankIds);
+    }
+
+    @Override
     public MatchDto getMatchInfo(String matchId) {
         return webClient.get()
                 .uri(asiaRequestUrl + "/lol/match/v5/matches/" + matchId)

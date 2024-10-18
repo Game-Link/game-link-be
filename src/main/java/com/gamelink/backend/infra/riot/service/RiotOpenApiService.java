@@ -25,5 +25,7 @@ public interface RiotOpenApiService {
 
     List<String> getMatchIdList(String puuid, int start, int count);
 
+    List<String> getRankMatchIdList(String puuid, int start, int count);
+
     MatchDto getMatchInfo(String matchId);
 }
