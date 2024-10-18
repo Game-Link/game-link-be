@@ -31,6 +31,7 @@ public class RiotAccountController {
      */
     @PostMapping("/register")
     @UserAuth
+    // TODO : SSO 인증을 통한 Riot 계정 등록으로 변경
     public void registerRiotAccountInfo(@Valid @RequestBody RequestRiotAccountDto request,
                                         AppAuthentication auth) {
         riotAccountService.registerRiotAccountInfo(request.getGameName(), request.getTagLine(), UUID.fromString(auth.getUserSubId()));

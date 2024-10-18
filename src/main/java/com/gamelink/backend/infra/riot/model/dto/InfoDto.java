@@ -23,7 +23,7 @@ public class InfoDto {
     private Long gameEndTimestamp;
     @Schema(description = "게임 아이디", example = "1234567890")
     private long gameId;
-    @Schema(description = "게임 모드", example = "ARAM")
+    @Schema(description = "게임 모드", example = "CLASSIC: 솔로랭크 / 팀랭크, ARAM: 칼바람, CHERRY: 아레나")
     private String gameMode;
     @Schema(description = "게임 이름", example = "teambuilder-match-7288220655")
     private String gameName;
@@ -39,7 +39,7 @@ public class InfoDto {
     private List<ParticipantDto> participants;
     @Schema(description = "플랫폼 아이디", example = "KR")
     private String platformId;
-    @Schema(description = "게임 큐 아이디", example = "450")
+    @Schema(description = "게임 큐 아이디")
     private int queueId;
     @Schema(description = "팀 정보")
     private List<TeamDto> teams;
