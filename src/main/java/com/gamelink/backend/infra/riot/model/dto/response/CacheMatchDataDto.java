@@ -11,6 +11,9 @@ public class CacheMatchDataDto {
     @Schema(description = "매치 Id")
     private final String matchId;
 
+    @Schema(description = "매치 타입")
+    private final String matchType;
+
     @Schema(description = "매치에서 플레이 한 챔피언 이름", example = "아트록스")
     private final String championName;
 

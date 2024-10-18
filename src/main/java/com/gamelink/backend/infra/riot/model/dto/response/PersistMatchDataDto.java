@@ -14,6 +14,9 @@ public class PersistMatchDataDto {
     @Schema(description = "매치 Id")
     private final String matchId;
 
+    @Schema(description = "매치 타입", example = "무작위 총력전")
+    private final String matchType;
+
     // TODO : 챔피언 URL로 변경
     @Schema(description = "매치에서 플레이 한 챔피언 이름", example = "아트록스")
     private final String championName;
@@ -101,6 +104,18 @@ public class PersistMatchDataDto {
 
     public PersistMatchDataDto(MatchDto matchDto, ParticipantDto participantDto) {
         this.matchId = matchDto.getMetadata().getMatchId();
+        this.matchType = switch (matchDto.getInfo().getQueueId()) {
+            case 0 -> "사용자 설정 게임";
+            case 400 -> "일반 게임 (드래프트)";
+            case 420 -> "개인/2인 랭크 게임";
+            case 430 -> "일반 게임";
+            case 440 -> "자유 랭크 게임";
+            case 450 -> "무작위 총력전";
+            case 1090 -> "일반 TFT";
+            case 1100 -> "랭크 TFT";
+            case 1700 -> "아레나";
+            default -> "알 수 없음";
+        };
         this.championName = participantDto.getChampionName();
         this.doubleKills = participantDto.getDoubleKills();
         this.firstBloodKill = participantDto.isFirstBloodKill();
@@ -134,6 +149,7 @@ public class PersistMatchDataDto {
     public static CacheMatchDataDto convertToCacheMatchDataDto(PersistMatchDataDto match) {
         return new CacheMatchDataDto(
                 match.getMatchId(),
+                match.getMatchType(),
                 match.getChampionName(),
                 match.getDoubleKills(),
                 match.isFirstBloodKill(),
