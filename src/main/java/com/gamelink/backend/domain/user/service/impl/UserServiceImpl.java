@@ -16,10 +16,14 @@ import com.gamelink.backend.global.auth.jwt.JwtAuthenticationToken;
 import com.gamelink.backend.global.auth.jwt.JwtProvider;
 import com.gamelink.backend.global.auth.jwt.repository.TokenRepository;
 import com.gamelink.backend.infra.riot.exception.RiotUserNotFoundException;
+import com.gamelink.backend.infra.riot.model.dto.CacheChampionDto;
+import com.gamelink.backend.infra.riot.model.dto.CacheKdaDto;
+import com.gamelink.backend.infra.riot.model.dto.response.CacheChampionDataDto;
 import com.gamelink.backend.infra.riot.model.dto.response.ResponseSummonerSoloRankDto;
 import com.gamelink.backend.infra.riot.model.dto.response.ResponseSummonerTeamRankDto;
 import com.gamelink.backend.infra.riot.model.entity.RankQueue;
 import com.gamelink.backend.infra.riot.model.entity.RiotUser;
+import com.gamelink.backend.infra.riot.repository.MatchIdCacheRepository;
 import com.gamelink.backend.infra.riot.repository.RiotUserRepository;
 import com.gamelink.backend.infra.riot.service.RiotOpenApiService;
 import com.gamelink.backend.infra.s3.model.dto.ImageRequest;
@@ -50,12 +54,21 @@ public class UserServiceImpl implements UserService {
     private final AWSObjectStorageService s3service;
 
     private final RiotUserRepository riotUserRepository;
+    private final MatchIdCacheRepository matchIdCacheRepository;
     private final RiotOpenApiService openApiService;
 
     @Override
     public ResponseUserProfileDto getUserProfile(UUID userSubId) {
         RiotUser riotUser = riotUserRepository.findOneByUserSubId(userSubId)
                 .orElseThrow(RiotUserNotFoundException::new);
+
+        CacheKdaDto totalKda = matchIdCacheRepository.getTotalKda(riotUser.getSubId());
+        CacheKdaDto soloKda = matchIdCacheRepository.getSoloKda(riotUser.getSubId());
+        CacheKdaDto teamKda = matchIdCacheRepository.getTeamKda(riotUser.getSubId());
+
+        List<CacheChampionDto> totalChampion = matchIdCacheRepository.getTotalChampion(riotUser.getSubId());
+        List<CacheChampionDto> soloChampion = matchIdCacheRepository.getSoloChampion(riotUser.getSubId());
+        List<CacheChampionDto> teamChampion = matchIdCacheRepository.getTeamChampion(riotUser.getSubId());
 
         String summonerIconUrl = openApiService.getProfileUrl(riotUser.getProfileIconId());
         return new ResponseUserProfileDto(
@@ -65,12 +78,12 @@ public class UserServiceImpl implements UserService {
                 riotUser.getQueues().stream().filter(RankQueue::isSoloRank).filter(RankQueue::isActive)
                         .findFirst().map(rq -> {
                             String rankImageUrl = openApiService.getRankImageUrl(rq);
-                            return new ResponseSummonerSoloRankDto(rq, rankImageUrl);
+                            return new ResponseSummonerSoloRankDto(rq, rankImageUrl, soloKda, soloChampion);
                         }).orElse(null),
                 riotUser.getQueues().stream().filter(RankQueue::isTeamRank).filter(RankQueue::isActive)
                         .findFirst().map(rq -> {
                             String rankImageUrl = openApiService.getRankImageUrl(rq);
-                            return new ResponseSummonerTeamRankDto(rq, rankImageUrl);
+                            return new ResponseSummonerTeamRankDto(rq, rankImageUrl, teamKda, teamChampion);
                         }).orElse(null),
                 new ResponseSummarizeMatchDataDto()
         );
