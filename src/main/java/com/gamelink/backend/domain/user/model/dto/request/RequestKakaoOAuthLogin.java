@@ -12,7 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestKakaoOAuthLogin {
 
-    private RequestDeviceInfo deviceInfo;
+    @Schema(description = "카카오 Access Token")
+    private String accessToken;
 
-    private RequestKakaoTokenInfo kakaoInfo;
+    @Schema(description = "사용자 고유 기기 ID")
+    private String deviceId;
 }

@@ -48,7 +48,7 @@ public class OAuthServiceImpl implements OAuthService {
     @Transactional
     public ResponseOAuthLoginDto kakaoLogin(RequestKakaoOAuthLogin request) {
         // TODO : OAuth (Kakao, Naver, Google) 로그인 토큰 관리 필요
-        JsonNode userResource = getUserResource(request.getKakaoInfo().getAccess_token(), "kakao");
+        JsonNode userResource = getUserResource(request.getAccessToken(), "kakao");
 
         String name = userResource.get("kakao_account").get("name").asText();
         String email = userResource.get("kakao_account").get("email").asText();
@@ -68,7 +68,7 @@ public class OAuthServiceImpl implements OAuthService {
                     .enrolled(Enrolled.KAKAO)
                     .build();
             user = userRepository.save(user);
-            Device device = Device.convertFromLoginRequest(user, request.getDeviceInfo());
+            Device device = Device.convertFromLoginRequest(user, request.getDeviceId());
             deviceRepository.save(device);
         }
         AuthenticationToken newToken = jwtProvider.issue(user);

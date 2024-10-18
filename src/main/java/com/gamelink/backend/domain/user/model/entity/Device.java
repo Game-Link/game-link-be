@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "device")
 public class Device extends BaseEntity {
 
+    // TODO : 다른 필드들은 일단 사용하지 않는 것으로 판단
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
@@ -26,21 +27,18 @@ public class Device extends BaseEntity {
 
     private String model;
 
-    public Device(User user, String uniqueId, String deviceId, String deviceName, String model) {
+    public Device(User user, String deviceId) {
         this.user = user;
-        this.uniqueId = uniqueId;
+        this.uniqueId = null;
         this.deviceId = deviceId;
-        this.deviceName = deviceName;
-        this.model = model;
+        this.deviceName = null;
+        this.model = null;
     }
 
-    public static Device convertFromLoginRequest(User user, RequestDeviceInfo request) {
+    public static Device convertFromLoginRequest(User user, String deviceId) {
         return new Device(
                 user,
-                request.getUniqueId(),
-                request.getDeviceId(),
-                request.getDeviceName(),
-                request.getModel()
+                deviceId
         );
     }
 }
